@@ -1,6 +1,7 @@
 package com.bezkoder.springjwt.controllers;
 
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.DateFormat;
@@ -12,17 +13,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.catalina.authenticator.SpnegoAuthenticator.AuthenticateAction;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,13 +73,14 @@ public class CourseController {
 	
 
 	@RequestMapping("/searchCoursesByTitle/{title}")
-	public ResponseEntity<?> getCourseByTitle(@PathVariable String title) {
+	public ResponseEntity<?> getCourseByTitle(@PathVariable String title, HttpServletRequest request) {
 		List<CourseDto> courseList = courseService.searchCourses(title);
 		if (courseList.size() == 0) {
 			return new ResponseEntity(new MessageResponse("Not Found"), HttpStatus.NOT_FOUND);
 		} else {
 			return ResponseEntity.ok(courseList);
 		}
+		
 	}
 	
 	@PostMapping("/register")
@@ -129,20 +135,6 @@ public class CourseController {
 		return ResponseEntity.ok(droppedClasses);
 	}
 	
-	
-	@PostMapping("/test")
-	public Authentication test() {
-//		Authentication authentication1 = authenticationManager.authenticate(
-//				new UsernamePasswordAuthenticationToken("Anh", "nguyenanh"));
-//
-//		SecurityContextHolder.getContext().setAuthentication(authentication1);
-		
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-		System.out.println(authentication.getName());
-		Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
-		return authentication2;
-	}
 	
 
 }

@@ -21,7 +21,9 @@ import com.bezkoder.springjwt.payload.request.RegisterRequest;
 @Service
 public interface ICourseService {
 	
+	// 
 	List<CourseDto> coursesToCourseDtos(List<Course> courses);
+	
 	
 	List<Integer> convertJsonArrayCoursesToRegIds(JSONArray jSONArray);
 	

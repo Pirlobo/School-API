@@ -66,11 +66,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		http.cors().and().csrf().disable()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+			// JSESSIONID Sẽ ko dc khởi tạo và ko bị sữ dụng để authenthicate subsequent request. Tất cả dửa vào authorization header đã dc tự động bỏ vào khi request
+			// We are using JWT which can be authenticated by itself. Hence, we dont need JSESSIONID 
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/api/auth/**", "/api/course/**", "/registrationConfirm*" , "/getCurrentUser").permitAll()
+			.authorizeRequests().antMatchers("/api/auth/**",  "/registrationConfirm*" , "/getCurrentUser").permitAll()
 			.antMatchers("/api/test/**", "/login").permitAll()
+			.antMatchers("/api/course/**").hasAuthority("ROLE_USER")
 			.anyRequest().authenticated();
-
+		
+//		 http.logout().disable();
+//	        http.formLogin().disable();
+//	        http.httpBasic().disable();
+//	        http.anonymous().disable();
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+//		http.logout()
+//		.logoutUrl("/api/auth/doLogout")
+//		.logoutSuccessUrl("/api/course/test1")
+//		.invalidateHttpSession(true)
+//		.deleteCookies("JSESSIONID");
+		
 	}
+	
 }

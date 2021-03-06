@@ -1,13 +1,17 @@
 package com.bezkoder.springjwt.controllers;
 
 import java.io.IOException;
+import java.net.http.HttpRequest;
 
 import javax.servlet.ServletContext;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -70,6 +75,9 @@ import com.bezkoder.springjwt.security.service.UserService;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 
 import groovy.util.ObjectGraphBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.DefaultClaims;
 import javassist.expr.NewArray;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -105,10 +113,9 @@ public class AuthController {
 
 	@Autowired
 	private PasswordResetTokenRepository passwordResetTokenRepository;
-
 	
 	@PostMapping("/signin")
-	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest req) {
 
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -120,18 +127,23 @@ public class AuthController {
 
 		User user = userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
 	
-		String jwt = user.getVerificationToken().getAccessToken();
+		String jwt = jwtUtils.generateJwtToken(authentication);
 		
 //		VerificationToken verificationToken = new VerificationToken(jwt, user);
 //		verificationTokenRepository.save(verificationToken);
 
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+//		org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+		
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 		User user3 = userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
 		System.out.println(user3.isActive());
 
-		return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId().intValue(), userDetails.getUsername(),
+//		HttpSession session = req.getSession(true);
+//	    session.setAttribute("SPRING_SECURITY_CONTEXT_KEY", SecurityContextHolder.getContext());
+		
+		return ResponseEntity.ok(new JwtResponse(jwt , userDetails.getId().intValue(), userDetails.getUsername(),
 				userDetails.getEmail(), roles, user3.isActive()));
 	}
 
@@ -276,37 +288,5 @@ public class AuthController {
 			return ResponseEntity.ok(new MessageResponse("Not Found"));
 		}
 	}
-	
-	@PostMapping("/doLogout")
-	public ResponseEntity<?> doLogout(){
-		return ResponseEntity.ok(new MessageResponse("Ok"));
-	}
-	
-	
-	
-	@PostMapping("/test")
-	public UserDetailsImpl test(@Valid @RequestBody LoginRequest loginRequest) {
-
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-	
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-		
-		Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
-		UserDetailsImpl userDetails1 = (UserDetailsImpl) authentication2.getPrincipal();
-		return userDetails1;
-
-	}
-	@PostMapping("/test1")
-	public Object test1() {		
-		Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
-		Object userDetails1 =  authentication2.getPrincipal();
-		return userDetails1;
-
-	}
-	
-	
 
 }

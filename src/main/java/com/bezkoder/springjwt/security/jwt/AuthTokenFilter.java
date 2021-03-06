@@ -1,10 +1,11 @@
 package com.bezkoder.springjwt.security.jwt;
 
 import java.io.IOException;
-
+import java.util.Arrays;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,6 +35,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		try {
 			String jwt = parseJwt(request);
+//			String cookie = getCookieValue(request, "JSESSIONID");
 			if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 				String username = jwtUtils.getUserNameFromJwtToken(jwt);
 				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -41,7 +43,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 						userDetails, null, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authentication);
-				System.out.println(authentication.getName() + "aefnajefnakjefnjaenfja");
 			}
 		} catch (Exception e) {
 			System.out.println("not jwt");
@@ -52,12 +53,18 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	}
 
 	private String parseJwt(HttpServletRequest request) {
-		String headerAuth = request.getHeader("Authorization");
-
+		String headerAuth = request.getHeader("Authorizations");
 		if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
 			return headerAuth.substring(7, headerAuth.length());
 		}
 
 		return null;
 	}
+//	private String getCookieValue(HttpServletRequest req, String cookieName) {
+//	    return Arrays.stream(req.getCookies())
+//	            .filter(c -> c.getName().equals(cookieName))
+//	            .findFirst()
+//	            .map(Cookie::getValue)
+//	            .orElse(null);
+//	}
 }

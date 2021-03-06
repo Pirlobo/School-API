@@ -11,6 +11,7 @@
  import org.springframework.stereotype.Repository;
 
  import com.bezkoder.springjwt.models.User;
+import com.bezkoder.springjwt.models.VerificationToken;
 
  @Repository
  public interface UserRepository extends JpaRepository<User, Long> {
@@ -27,6 +28,7 @@
  	Boolean existsByEmail(String email);
  	
 
+ 	User findByVerificationToken(VerificationToken verificationToken);
  	
  	
  	
