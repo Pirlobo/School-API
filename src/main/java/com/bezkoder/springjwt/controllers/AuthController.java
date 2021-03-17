@@ -1,3 +1,4 @@
+
 package com.bezkoder.springjwt.controllers;
 
 import java.io.IOException;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.bezkoder.springjwt.dto.CourseDto;
+import com.bezkoder.springjwt.exceptions.NullExceptionHandler;
 import com.bezkoder.springjwt.models.ERole;
 import com.bezkoder.springjwt.models.PasswordResetToken;
 import com.bezkoder.springjwt.models.Role;
@@ -77,7 +79,7 @@ public class AuthController {
 
 	@Autowired
 	private PasswordResetTokenService passwordResetTokenService;
-	
+
 	@Autowired
 	private CourseService courseService;
 
@@ -119,10 +121,13 @@ public class AuthController {
 		user.getRoles().add(role1);
 		userService.save(user);
 
-		final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort()
-				+ request.getContextPath();
+		Thread newThread = new Thread(() -> {
+			final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort()
+					+ request.getContextPath();
 
-		eventPublisher.publishEvent(new OnRegistrationEvent(user, appUrl));
+			eventPublisher.publishEvent(new OnRegistrationEvent(user, appUrl));
+		});
+		newThread.start();
 
 		return ResponseEntity.ok(new MessageResponse("Please, check your email to activate your account"));
 	}
@@ -174,16 +179,17 @@ public class AuthController {
 		User user = userService.findByEmail(fetchedEmail);
 		System.out.println(user);
 		if (user == null || !user.isActive()) {
-			return ResponseEntity.ok(new MessageResponse("Can not find user with the given email"));
+			return new ResponseEntity(new NullExceptionHandler("Not Found"), HttpStatus.NOT_FOUND);
 		}
-		final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort()
-				+ request.getContextPath();
+		Thread newThread = new Thread(() -> {
+			final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort()
+					+ request.getContextPath();
 
-		eventPublisher.publishEvent(new OnResetPasswordEvent(user, appUrl));
-		PasswordResetToken passwordResetToken = passwordResetTokenService.findByUser(user);
+			eventPublisher.publishEvent(new OnResetPasswordEvent(user, appUrl));
+		});
+		newThread.start();
 
-		String token = passwordResetToken.getToken();
-		return ResponseEntity.ok(new ResetPasswordResponse(token));
+		return ResponseEntity.ok(new MessageResponse("Code has been sent via email"));
 
 	}
 
@@ -198,7 +204,7 @@ public class AuthController {
 
 			return ResponseEntity.ok(new StudentDto(fetchedCode, user.getEmail(), user.getUsername()));
 		} catch (Exception e) {
-			return new ResponseEntity(new MessageResponse("Not Found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity(new NullExceptionHandler("Not Found"), HttpStatus.NOT_FOUND);
 		}
 
 	}
@@ -221,6 +227,5 @@ public class AuthController {
 			return ResponseEntity.ok(new MessageResponse("Not Found"));
 		}
 	}
-
 
 }

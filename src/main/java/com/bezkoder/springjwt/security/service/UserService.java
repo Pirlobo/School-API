@@ -75,6 +75,7 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private OrderService orderService;
+	
 
 	@Override
 	public void createVerificationTokenForUser(final User user, final String token) {
@@ -86,9 +87,10 @@ public class UserService implements IUserService {
 
 	@Override
 	public void createPasswordResetTokenForUser(User user, String token, String code) {
+		passwordResetTokenRepository.deleteAll();
+		user.setPasswordResetToken(null);
 		PasswordResetToken myToken = new PasswordResetToken(token, user);
 		myToken.setCode(code);
-		user.setPasswordResetToken(null);
 		passwordResetTokenRepository.save(myToken);
 	}
 

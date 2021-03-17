@@ -14,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.bezkoder.springjwt.book.Authors;
 import com.bezkoder.springjwt.book.BookItems;
@@ -47,6 +48,7 @@ import com.bezkoder.springjwt.persistence.UserRepository;
 
 @SpringBootApplication
 @EnableCaching
+@EnableAsync
 public class SpringBootSecurityJwtApplication {
 	@Autowired
 	RoleRepository roleRepository;
