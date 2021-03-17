@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.models;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
@@ -9,10 +10,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.util.Calendar;
 import java.util.Date;
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class VerificationToken {
 
     private static final int EXPIRATION = 60 * 24;

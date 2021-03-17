@@ -32,7 +32,8 @@ public class JwtUtils {
 //				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				// 60000 = 1 minute
 				// => 900000 = 15 minutes 
-				.setExpiration(new Date(( System.currentTimeMillis() + 10000000 )))
+//				.setExpiration(new Date(( System.currentTimeMillis() + 10000000 )))
+				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 	}

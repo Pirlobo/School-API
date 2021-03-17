@@ -2,22 +2,17 @@ package com.bezkoder.springjwt.book;
 
 import java.util.ArrayList;
 
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -32,9 +27,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import com.bezkoder.springjwt.models.Course;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
-
 import org.hibernate.annotations.Cache;
 
 @Entity
@@ -59,18 +52,31 @@ public class Books {
 	@NotNull
 	private Integer numOfPages;
 	
-	@ManyToOne
-	@JsonManagedReference
-	private Course course;
+
+	@ManyToMany(mappedBy = "books", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//	@JoinTable(name = "course_books",
+//	joinColumns = { @JoinColumn(name = "fk_book") },
+//	inverseJoinColumns = { @JoinColumn(name = "fk_course") })
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	@JsonIgnore 
+	private List<Course> courses = new ArrayList<Course>();
 
 	@OneToMany(fetch = FetchType.LAZY)
-	@JsonIgnore
 	private List<BookItems> bookItems = new ArrayList<BookItems>();
 	
+	public List<Course> getCourses() {
+		return courses;
+	}
+
+	public void setCourses(List<Course> courses) {
+		this.courses = courses;
+	}
+
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "books_authors",
 	joinColumns = { @JoinColumn(name = "fk_book") },
 	inverseJoinColumns = { @JoinColumn(name = "fk_author") })
+	@JsonIgnore
 	private List<Authors> authorList = new ArrayList<Authors>();
 
 	public String getISBN() {
@@ -177,13 +183,6 @@ public class Books {
 		bookItems.add(bookItem);
 	}
 
-	public Course getCourse() {
-		return course;
-	}
-
-	public void setCourse(Course course) {
-		this.course = course;
-	}
 	
 	
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.bezkoder.springjwt.book.Books;
+import com.bezkoder.springjwt.dto.BookDto;
 import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.User;
@@ -35,7 +36,7 @@ public interface ICourseService {
 	List<CourseDto> searchCourses(String subject);
 
 	// get all required books of a student
-	List<Books> getAllRequiredBooks();
+	Set<Books> getAllRequiredBooks( String userName);
 
 	// get all registered classes of a student
 	public List<Course> findRegisteredClasses(List<Integer> regIdClasses);
@@ -91,6 +92,9 @@ public interface ICourseService {
 	// check at least one class is selected in order to register
 	public boolean isAnyCourseSelected(List<Integer> regIdClasses);
 
+	
+
+		
 
 }
 

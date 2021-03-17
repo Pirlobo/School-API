@@ -26,6 +26,6 @@ public interface BookRepository extends JpaRepository<Books, Integer> {
 	@Query(value = "select * from book as b inner JOIN books_authors as ba on b.id = ba.fk_book inner join author as a on ba.fk_author = a.id where a.name like %?1% or b.title like %?1%", nativeQuery = true)
 	Set<Books> findByTitleOrAuthor(String name);
 
-	@Query(value = "select * from book as b inner join course_books as cb on b.id = cb.books_id and cb.course_id = ?1", nativeQuery = true)
-	List<Books> findAllByCourse(Integer courseId);
+	@Query(value = "select * from book as b inner join course_books as cb on b.id = cb.books_id and cb.courses_id = ?1", nativeQuery = true)
+	Set<Books> findAllByCourse(Integer courseId);
 }

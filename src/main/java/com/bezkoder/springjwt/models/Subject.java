@@ -4,6 +4,7 @@ package com.bezkoder.springjwt.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -12,12 +13,17 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 
 @Entity
 @Table(name = "subject")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Subject {
 
 	@Id
@@ -30,9 +36,11 @@ public class Subject {
 	private SubjectCode subjectCode;
 	
 	@OneToMany(mappedBy = "subject")
+	@JsonIgnore
 	private List<Course> courses = new ArrayList<Course>();
 	
 	@OneToOne
+	@JsonIgnore
 	private Subject prerequisite;
 	
 	

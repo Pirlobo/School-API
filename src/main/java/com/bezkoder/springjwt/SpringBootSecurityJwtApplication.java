@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 import com.bezkoder.springjwt.book.Authors;
 import com.bezkoder.springjwt.book.BookItems;
@@ -45,6 +46,7 @@ import com.bezkoder.springjwt.persistence.UserRepository;
 
 
 @SpringBootApplication
+@EnableCaching
 public class SpringBootSecurityJwtApplication {
 	@Autowired
 	RoleRepository roleRepository;
@@ -87,11 +89,12 @@ public class SpringBootSecurityJwtApplication {
 	}
 	@PostConstruct
 	public void init() {
-
+		
+		
 		List<Books> books = new ArrayList<Books>();
 		
-		Books book1 = new Books(1, "978-3-16-148410-0", "Java 1", "Anh T Nguyen","English", 100);
-		Books book2 = new Books(2, "978-3-16-148410-0", "Java 2", "Anh T Nguyen","English", 200);
+		Books book1 = new Books(1, "978-3-16-148410-0", "Java 2", "Anh T Nguyen","English", 100);
+		Books book2 = new Books(2, " 978-1-4028-9462-6", "Java 1", "Anh T Nguyen","English", 200);
 		
 		
 		
@@ -179,9 +182,10 @@ public class SpringBootSecurityJwtApplication {
 		course3.setSubject(subject2);
 		course4.setSubject(subject2);
 		course5.setSubject(subject3);
-		course1.addBook(book1);
+		course1.getBooks().add(book1);
+		course1.getBooks().add(book2);
 		courseRepository.save(course1);
-		course3.addBook(book2);
+		course3.getBooks().add(book2);
 		
 		courseRepository.save(course3);
 		courseRepository.save(course2);

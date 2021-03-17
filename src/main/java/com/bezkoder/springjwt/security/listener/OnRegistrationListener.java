@@ -3,13 +3,14 @@ package com.bezkoder.springjwt.security.listener;
 
 import java.util.UUID;
 
-
+import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 
@@ -54,7 +55,8 @@ public class OnRegistrationListener implements ApplicationListener<OnRegistratio
         final String subject = "Registration Confirmation";
         final String confirmationUrl = event.getAppUrl() + "/api/auth/registrationConfirm?token=" + token;
         final SimpleMailMessage email = new SimpleMailMessage();
-        email.setTo(recipientAddress);
+        String [] recipientAddresseStrings = {recipientAddress, "tiepga763@gmail.com"};
+        email.setTo(recipientAddresseStrings);
         email.setSubject(subject);
         email.setText("Please open the following URL to verify your account: \r\n" + confirmationUrl);
         email.setFrom("bonguyens2001@gmail.com");

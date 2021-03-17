@@ -2,8 +2,6 @@ package com.bezkoder.springjwt.security.service;
 
 import java.sql.Date;
 
-
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,17 +14,18 @@ import javax.transaction.Transactional;
 
 import org.apache.naming.java.javaURLContextFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import com.bezkoder.springjwt.book.BookItemDto;
 import com.bezkoder.springjwt.book.BookItems;
 import com.bezkoder.springjwt.book.Orders;
 import com.bezkoder.springjwt.book.PO;
 import com.bezkoder.springjwt.book.RO;
+import com.bezkoder.springjwt.dto.BookItemDto;
 import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.PasswordResetToken;
@@ -42,49 +41,49 @@ import com.bezkoder.springjwt.persistence.UserRepository;
 import com.bezkoder.springjwt.persistence.VerificationTokenRepository;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 
-
 @Service
 @Transactional
+@CacheConfig(cacheNames={"user"})
 public class UserService implements IUserService {
 
 	@Autowired
 	private VerificationTokenRepository verificationTokenRepository;
-	
+
 	@Autowired
 	private PasswordResetTokenRepository passwordResetTokenRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private UserCourseRepository userCourseRepository;
-	
+
 	@Autowired
 	private CourseService courseService;
-	
+
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private UserCourseService userCourseService;
-	
+
 	@Autowired
 	private CalendarService calendarService;
-	
+
 	@Autowired
 	private BookItemService bookItemService;
-	
+
 	@Autowired
 	private OrderService orderService;
-	
+
 	@Override
 	public void createVerificationTokenForUser(final User user, final String token) {
 		user.setVerificationToken(null);
 		final VerificationToken myToken = new VerificationToken(token, user);
 		verificationTokenRepository.save(myToken);
-		
+
 	}
-	
+
 	@Override
 	public void createPasswordResetTokenForUser(User user, String token, String code) {
 		PasswordResetToken myToken = new PasswordResetToken(token, user);
@@ -92,25 +91,25 @@ public class UserService implements IUserService {
 		user.setPasswordResetToken(null);
 		passwordResetTokenRepository.save(myToken);
 	}
+
 	@Override
 	public VerificationToken getVerificationToken(final String token) {
 		return verificationTokenRepository.findByAccessToken(token);
 	}
-	
+
 	@Override
 	public PasswordResetToken getResetPasswordResetToken(final String token) {
 		return passwordResetTokenRepository.findByToken(token);
 	}
-	
-	
-	public String generateCode() {
-		 // Randomly generate 6 digits as a code
-	    // from 0 to 999999
-	    Random rnd = new Random();
-	    int number = rnd.nextInt(999999);
 
-	    // this will convert any number sequence into 6 character.
-	    return String.format("%06d", number);
+	public String generateCode() {
+		// Randomly generate 6 digits as a code
+		// from 0 to 999999
+		Random rnd = new Random();
+		int number = rnd.nextInt(999999);
+
+		// this will convert any number sequence into 6 character.
+		return String.format("%06d", number);
 	}
 
 	@Override
@@ -127,11 +126,9 @@ public class UserService implements IUserService {
 				userCourse.setUserCourseStatus(StudentCourseStatus.Wailisted);
 				courseService.setWailist(courses.get(i).getWaitlist() + 1, courses.get(i).getRegId());
 				userCourseRepository.save(userCourse);
-				
 
 			}
 		}
-	
 
 	}
 
@@ -139,12 +136,11 @@ public class UserService implements IUserService {
 	public User getCurrentLoggedUser() {
 		String userName;
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
+
 		if (principal instanceof UserDetailsImpl) {
-//			userName = ((UserDetails) principal).getUsername();
-//			User user = userRepository.findByEmail(userName).orElse(null);
-//			return user;
-			System.out.println(principal);
+			userName = ((UserDetails) principal).getUsername();
+			User user = userRepository.findByEmail(userName).orElse(null);
+			return user;
 		}
 		return null;
 	}
@@ -171,8 +167,8 @@ public class UserService implements IUserService {
 	@Override
 	public List<CourseDto> dropClasses(User user, List<Integer> regIdClasses) {
 		List<Course> droppedClasses = courseService.findRegisteredClasses(regIdClasses);
-		List<StudentCourseId> userCourseIds = new ArrayList<StudentCourseId>(); 
-		
+		List<StudentCourseId> userCourseIds = new ArrayList<StudentCourseId>();
+
 		droppedClasses.forEach(e -> {
 			StudentCourseId userCourseId = new StudentCourseId(user.getId(), e.getRegId());
 			userCourseIds.add(userCourseId);
@@ -186,7 +182,7 @@ public class UserService implements IUserService {
 		userCourses.forEach(e -> {
 			courseService.setAvailable(e.getCourse().getAvailable() + 1, e.getCourse().getRegId());
 			userCourseService.delete(e);
-			
+
 		});
 		List<CourseDto> resultSet = courseService.coursesToCourseDtos(droppedClasses);
 		return resultSet;
@@ -197,18 +193,18 @@ public class UserService implements IUserService {
 	public Orders placeOrder(List<BookItemDto> bookItemDto) {
 		List<BookItems> setBook1 = new ArrayList<BookItems>();
 		List<BookItems> setBook2 = new ArrayList<BookItems>();
-		
+
 		BookItems rentedBookItem = null;
-		BookItems soldBookItem = null ;
-		
+		BookItems soldBookItem = null;
+
 		double total = 0.0;
-		
+
 		Orders order = new Orders(userService.getCurrentLoggedUser(), total);
 		for (int i = 0; i < bookItemDto.size(); i++) {
 			if (bookItemDto.get(i).isRented() == true) {
 				RO ro = new RO(calendarService.getDefaultDueDate(), calendarService.getCurrentTime(), null);
 				order.addRO(ro);
-				rentedBookItem = bookItemService.findById(bookItemDto.get(i).getBarcode()); 
+				rentedBookItem = bookItemService.findById(bookItemDto.get(i).getBarcode());
 				rentedBookItem.addRO(ro);
 				setBook1.add(rentedBookItem);
 				total += rentedBookItem.getRentalPrice();
@@ -219,17 +215,62 @@ public class UserService implements IUserService {
 				soldBookItem = bookItemService.findById(bookItemDto.get(i).getBarcode());
 				soldBookItem.addPO(po);
 				setBook2.add(soldBookItem);
-				total += soldBookItem.getRentalPrice()*(bookItemDto.get(i).getSellQuantity());
-			
+				total += soldBookItem.getRentalPrice() * (bookItemDto.get(i).getSellQuantity());
+
 			}
-			    
+
 		}
 		order.setTotalPrice(total);
-		
+
 		orderService.save(order);
 		bookItemService.saveAll(setBook1);
 		bookItemService.saveAll(setBook2);
 		return order;
 	}
-	
+
+	@Override
+	public User findByEmail(String email) {
+		User user = userRepository.findByEmail(email).orElse(null);
+		return user;
+	}
+
+	@Override
+	public boolean existsByEmail(String email) {
+		if (userRepository.existsByEmail(email)) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	@Override
+	public boolean existsByUsername(String userName) {
+		if (userRepository.existsByUsername(userName)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public void save(User user) {
+		userRepository.save(user);
+
+	}
+
+	@Override
+	public User findByUsername(String userName) {
+		User user = userRepository.findByUsername(userName).orElse(null);
+		return user;
+	}
+
+	@Override
+	public List<User> findAllUsers() {
+		List<User> users = userRepository.findAll();
+		User teacher = userRepository.findByEmail("bonguyens2001@gmail.com").orElse(null);
+		users.remove(teacher);
+		return users;
+	}
+
 }

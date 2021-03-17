@@ -1,6 +1,5 @@
 package com.bezkoder.springjwt.security.service;
 
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -11,6 +10,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.noneDSA;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +31,13 @@ import com.bezkoder.springjwt.payload.request.RegisterRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.persistence.BookRepository;
 import com.bezkoder.springjwt.persistence.CourseRepository;
+import com.bezkoder.springjwt.persistence.UserRepository;
 import com.google.common.collect.Lists;
 
 import antlr.debug.NewLineEvent;
 
 @Service
+@CacheConfig(cacheNames={"course"})   
 public class CourseService implements ICourseService {
 
 	@Autowired
@@ -46,16 +48,19 @@ public class CourseService implements ICourseService {
 
 	@Autowired
 	private UserService userService;
-
+	
+	@Autowired
+	private UserRepository userRepository;
+	
 	@Autowired
 	CourseService courseService;
-	
+
 	@Override
 	public Course findCourseById(Integer id) {
 		Course course = courseRepository.findById(id).orElse(null);
 		return course;
 	}
-	
+
 	@Override
 	public List<CourseDto> searchCourses(String title) {
 		int year = Calendar.getInstance().get(Calendar.YEAR);
@@ -64,13 +69,16 @@ public class CourseService implements ICourseService {
 		courseList.forEach(e -> {
 			String from = e.getCalendars().get(0).getStartTime().toString().substring(0, 5);
 			String to = e.getCalendars().get(0).getEndTime().toString().substring(0, 5);
-			String prerequisite ;
+			String prerequisite;
 			try {
 				prerequisite = e.getSubject().getPrerequisite().getSubjectCode().toString();
 			} catch (Exception e2) {
 				prerequisite = "None";
 			}
-			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(), e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(), e.getRoom().getRoomName(), e.getTeacher().getName(), from,  to, prerequisite, e.getTerm().getSemester().toString());
+			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
+					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
+					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
+					e.getTerm().getSemester().toString());
 			resultSet.add(courseDto);
 		});
 		return resultSet;
@@ -79,27 +87,13 @@ public class CourseService implements ICourseService {
 
 	@Override
 	// @Cacheable(value = "courseCache")
-	public List<Books> getAllRequiredBooks() {
-		List<Integer> id = new ArrayList<Integer>();
-		User user = userService.getCurrentLoggedUser();
-		List<Course> courses = new ArrayList<Course>();
-		List<StudentCourse> UserCourse = user.getCourses();
-		UserCourse.forEach(e -> {
-			if (e.getUserCourseStatus().equals(StudentCourseStatus.Successfull)) {
-				courses.add(e.getCourse());
-			}
-		});
+	public Set<Books> getAllRequiredBooks(String userName) {
+		Set<Books> bookList = new HashSet<Books>();
+		User user = userRepository.findByUsername(userName).orElse(null);
+		List<Course> courses = userService.getYourClasses(user);
 		courses.forEach(e -> {
-			id.add(e.getRegId());
-		});
-		List<Books> bookList = new ArrayList<Books>();
-		id.forEach(e -> {
-			List<Books> bookListForEachCourse = new ArrayList<Books>();
-			bookListForEachCourse = bookRepository.findAllByCourse(e);
-			bookListForEachCourse.forEach(i -> {
-				bookList.add(i);
-			});
-
+			List<Books> books = e.getBooks();
+			bookList.addAll(books);
 		});
 		return bookList;
 	}
@@ -136,45 +130,45 @@ public class CourseService implements ICourseService {
 		List<Course> registeredCourses = userService.getYourClasses(user);
 		List<Course> courses2 = findRegisteredClasses(regIdClasses);
 		courses2.forEach(e -> {
+			
 			if (!(isPreregquisited(user, e))) {
+				System.out.println("a");
 				failedRegisteredClasses.add(e);
-			}
-			else {
+			} else {
+				System.out.println("b");
 				List<Course> currentCourses = userService.getYourClasses(user);
 				for (int i = 0; i < currentCourses.size(); i++) {
-					if (currentCourses.get(i).getTerm().getSemester().toString().equals(
-							e.getTerm().getSemester().toString()) ) {
-							if (currentCourses.get(i).getTerm().getYear() == 
-									e.getTerm().getYear()) {
-								failedRegisteredClasses.add(e);
-							}
-						} 
-					
+					if (currentCourses.get(i).getTerm().getSemester().toString()
+							.equals(e.getTerm().getSemester().toString())) {
+						if (currentCourses.get(i).getTerm().getYear() == e.getTerm().getYear()) {
+							System.out.println("d");
+							failedRegisteredClasses.add(e);
+						}
+					}
+
 				}
-				
+
 			}
 			if (!isNotTimeConflicted(user, e, regIdClasses)) {
+				System.out.println("c");
 				failedRegisteredClasses.add(e);
 			}
 		});
-		
-		
 
 		for (int i = 0; i < regIdClasses.size(); i++) {
-			if(isDuplicated(regIdClasses)) {
-				Course course1 = courseRepository.findById(regIdClasses.get(i)).orElse(null);
-				System.out.println("nè");
-				if (!(isRepeated(user, course1))) { 
-					failedRegisteredClasses.add(course1);
-					System.out.println("course");
-				}
+			Course course1 = courseRepository.findById(regIdClasses.get(i)).orElse(null);
+			if (!(isRepeated(user, course1))) {
+				System.out.println("f");
+				failedRegisteredClasses.add(course1);
 			}
-			for (int j = 0; j < registeredCourses.size(); j++) {
+
+		for (int j = 0; j < registeredCourses.size(); j++) {
 				if (regIdClasses.get(i) == registeredCourses.get(j).getRegId()) {
+					System.out.println("e");
 					Course course = courseRepository.findById(regIdClasses.get(i)).orElse(null);
 					failedRegisteredClasses.add(course);
 
-				} 
+				}
 			}
 		}
 		return failedRegisteredClasses;
@@ -253,22 +247,25 @@ public class CourseService implements ICourseService {
 	public boolean isRepeated(User user, Course course) {
 		List<Course> currentCourses = userService.getYourClasses(user);
 		for (int i = 0; i < currentCourses.size(); i++) {
+			if (currentCourses.get(i).getSubject().getSubjectCode().toString().equals(course.getSubject().getSubjectCode().toString())) {
+				
 				if (!(isPassed(user, currentCourses.get(i)))) {
-					if (currentCourses.get(i).getTerm().getSemester().toString().equals(
-						course.getTerm().getSemester().toString()) ) {
-						if (currentCourses.get(i).getTerm().getYear() == 
-								course.getTerm().getYear()) {
+					if (currentCourses.get(i).getTerm().getSemester().toString()
+							.equals(course.getTerm().getSemester().toString())) {
+						if (currentCourses.get(i).getTerm().getYear() == course.getTerm().getYear()) {
 							return false;
 						} else {
 							return true;
 						}
 					} else {
-						System.out.println("True");
 						return true;
 					}
+					
 				}
 				return false;
+			}
 			
+
 		}
 		return true;
 	}
@@ -277,7 +274,7 @@ public class CourseService implements ICourseService {
 	@Override
 	public boolean isDuplicated(List<Integer> regIdClasses) {
 		List<Course> checkedCourses = findRegisteredClasses(regIdClasses);
-
+		System.out.println(checkedCourses.get(0).getRegId());
 		for (int i = 0; i < checkedCourses.size(); i++) {
 
 			for (int j = i + 1; j < checkedCourses.size(); j++) {
@@ -341,7 +338,7 @@ public class CourseService implements ICourseService {
 						.before(registeredCourses.get(i).getCalendars().get(0).getStartTime())
 						&& course.getCalendars().get(0).getEndTime()
 								.before(registeredCourses.get(i).getCalendars().get(0).getStartTime())) {
-				
+
 					continue;
 				} else if (course.getCalendars().get(0).getStartTime()
 						.after(registeredCourses.get(i).getCalendars().get(0).getEndTime())
@@ -450,16 +447,16 @@ public class CourseService implements ICourseService {
 //		JSONObject json = new JSONObject(regIdClasses); 		
 		List<Course> courses = new ArrayList<Course>();
 //		 JSONArray jsonArray = json.getJSONArray("regIdClasses");
-		 for (int i = 0 ; i < jsonArray.length(); i++) {
-			 Course course = courseService.findCourseById(jsonArray.getInt(i));
-			 courses.add(course);
-		 }
+		for (int i = 0; i < jsonArray.length(); i++) {
+			Course course = courseService.findCourseById(jsonArray.getInt(i));
+			courses.add(course);
+		}
 		return courses;
 	}
 
 	@Override
 	public List<Integer> convertJsonArrayCoursesToRegIds(JSONArray jSONArray) {
-		List<Integer> reg_ids = new ArrayList<Integer>(); 
+		List<Integer> reg_ids = new ArrayList<Integer>();
 		for (int i = 0; i < jSONArray.length(); i++) {
 			reg_ids.add(jSONArray.getInt(i));
 		}
@@ -468,7 +465,7 @@ public class CourseService implements ICourseService {
 
 	@Override
 	public List<CourseDto> coursesToCourseDtos(List<Course> courses) {
-		
+
 		List<CourseDto> courseDtos = new ArrayList<CourseDto>();
 		courses.forEach(e -> {
 			String from = e.getCalendars().get(0).getStartTime().toString().substring(0, 5);
@@ -479,11 +476,14 @@ public class CourseService implements ICourseService {
 			} catch (Exception ex) {
 				prerequisite = "None";
 			}
-			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(), e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(), e.getRoom().getRoomName(), e.getTeacher().getName(), from,  to, prerequisite, e.getTerm().getSemester().toString());
+			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
+					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
+					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
+					e.getTerm().getSemester().toString());
 			courseDtos.add(courseDto);
 		});
 		return courseDtos;
-	
+
 	}
 
 }

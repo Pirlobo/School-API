@@ -1,16 +1,15 @@
 package com.bezkoder.springjwt.models;
 
 import java.sql.Date;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -20,16 +19,18 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.search.annotations.Boost;
-import org.thymeleaf.expression.Calendars;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.bezkoder.springjwt.book.Books;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import antlr.debug.NewLineEvent;
 
 @Entity
 @Table(name = "course")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Course {
 
 	@Id
@@ -48,9 +49,30 @@ public class Course {
 	private Date endDay;
 	
 	@ManyToOne
+	@JsonIgnore
 	private Term term;
 	
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//	@JoinTable(name = "course_books",
+//	joinColumns = { @JoinColumn(name = "fk_course") },
+//	inverseJoinColumns = { @JoinColumn(name = "fk_book") })
+	@JsonIgnore
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private List<Books> books = new ArrayList<Books>();
+
+
+
+	public void setBooks(List<Books> books) {
+		this.books = books;
+	}
 	
+	public List<Books> getBooks() {
+		return books;
+	}
+
+	public void setBookList(List<Books> books) {
+		this.books = books;
+	}
 
 	public Term getTerm() {
 		return term;
@@ -60,16 +82,8 @@ public class Course {
 		this.term = term;
 	}
 
-	public List<Books> getBooks() {
-		return books;
-	}
-
-	public void setBooks(List<Books> books) {
-		this.books = books;
-	}
-
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Books> books = new ArrayList<Books>();
+//	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+//	private List<Books> books = new ArrayList<Books>();
 	
 	@ManyToOne 
 	private Subject subject;
@@ -119,13 +133,16 @@ public class Course {
 	}
 
 	@ManyToOne
+	@JsonIgnore
 	private Teacher teacher;
 
 	@OneToMany(mappedBy = "course")
+	@JsonIgnore
 	private List<Classroom> calendars = new ArrayList<Classroom>();
 
 	@ManyToOne
 	@JoinColumn(name = "room_id", foreignKey = @javax.persistence.ForeignKey(name = "room_id_FK"))
+	@JsonIgnore
 	private Room room;
 
 	public List<Classroom> getCalendars() {
@@ -141,6 +158,7 @@ public class Course {
 //	joinColumns = { @JoinColumn(name = "fk_course") },
 //	inverseJoinColumns = { @JoinColumn(name = "fk_user") })
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<StudentCourse> users = new ArrayList<StudentCourse>();
 
 	public List<StudentCourse> getUsers() {
@@ -164,11 +182,6 @@ public class Course {
 		this.teacher = teacher;
 		this.room = room;
 		this.term = term;
-	}
-	
-	public void addBook(Books book) {
-		books.add(book);
-		book.setCourse( this );
 	}
 
 	public Course(Integer regId, Integer section, Integer available, Date startDay, Date endDay, Teacher teacher,

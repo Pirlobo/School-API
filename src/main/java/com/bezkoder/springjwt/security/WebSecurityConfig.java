@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.bezkoder.springjwt.security.jwt.AuthEntryPointJwt;
@@ -32,10 +33,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
 
-	@Bean
-	public AuthTokenFilter authenticationJwtTokenFilter() {
-		return new AuthTokenFilter();
-	}
+	@Autowired
+	private AuthTokenFilter authTokenFilter;
+
+	// we can use either way . @Autuwired or creating an instance by the method specified below
+//	@Bean
+//	public AuthTokenFilter authenticationJwtTokenFilter() {
+//		return new AuthTokenFilter();
+//	}
 
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -71,14 +76,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests().antMatchers("/api/auth/**",  "/registrationConfirm*" , "/getCurrentUser").permitAll()
 			.antMatchers("/api/test/**", "/login").permitAll()
-			.antMatchers("/api/course/**").hasAuthority("ROLE_USER")
+			.antMatchers("/api/course/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER")
+			.antMatchers("/api/teacher/**").hasAnyAuthority("ROLE_TEACHER")
+			.antMatchers("/api/book/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER")
+			.antMatchers("/api/student/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER")
+			.antMatchers("/api/student/upload").hasAnyAuthority("ROLE_TEACHER")
 			.anyRequest().authenticated();
 		
 //		 http.logout().disable();
 //	        http.formLogin().disable();
 //	        http.httpBasic().disable();
 //	        http.anonymous().disable();
-		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 //		http.logout()
 //		.logoutUrl("/api/auth/doLogout")
 //		.logoutSuccessUrl("/api/course/test1")

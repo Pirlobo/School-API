@@ -11,6 +11,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.hibernate.FetchMode;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +25,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 			@UniqueConstraint(columnNames = "username"),
 			@UniqueConstraint(columnNames = "email") 
 		})
-public class User {
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class User{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,10 +38,30 @@ public class User {
 	@Column(unique = true)
 	private String username;
 	private boolean isActive;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user")
+	private List<FileDB> files;
 
+	
+
+
+
+	public List<FileDB> getFiles() {
+		return files;
+	}
+
+	public void setFiles(List<FileDB> files) {
+		this.files = files;
+	}
+
+
+
+	@JsonIgnore
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private PasswordResetToken passwordResetToken;
 	
+	@JsonIgnore
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private VerificationToken verificationToken;
 
@@ -50,6 +74,7 @@ public class User {
 	@Size(max = 120)
 	private String password;
 
+	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(	name = "user_roles", 
 				joinColumns = @JoinColumn(name = "user_id"), 
@@ -71,6 +96,7 @@ public class User {
 	}
 
 
+	
 	 @OneToMany(
 		        mappedBy = "user",
 		        cascade = CascadeType.ALL,
@@ -87,6 +113,7 @@ public class User {
 		        orphanRemoval = true,
 		        fetch = FetchType.LAZY
 		    )
+	 @JsonIgnore
 	private List<Orders> orders = new ArrayList<Orders>();
 
 	public Long getId() {
@@ -154,7 +181,7 @@ public class User {
 	}
 
 	public List<StudentCourse> getCourses() {
-		return courses;
+		return courses;  
 	}
 
 	public void setCourses(List<StudentCourse> courses) {

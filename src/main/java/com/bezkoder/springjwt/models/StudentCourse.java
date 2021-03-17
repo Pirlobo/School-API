@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.models;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 
 import javax.persistence.Embeddable;
@@ -13,15 +14,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudentCourse {
 	@EmbeddedId
 	private StudentCourseId userCourseId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@MapsId("id")
+	@JsonIgnore
 	private User user;
 
 	@Enumerated(EnumType.STRING)
@@ -119,7 +127,7 @@ public class StudentCourse {
 		this.user = user;
 		this.course = course; 
 		this.userCourseId = new StudentCourseId(user.getId(), course.getRegId());
-		this.isPassed = isPassed.TRUE;
+		this.isPassed = isPassed.FALSE;
 
 	}
 
