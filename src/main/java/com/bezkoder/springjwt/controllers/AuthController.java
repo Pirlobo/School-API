@@ -80,8 +80,7 @@ public class AuthController {
 	@Autowired
 	private PasswordResetTokenService passwordResetTokenService;
 
-	@Autowired
-	private CourseService courseService;
+	
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest req) {
@@ -97,6 +96,7 @@ public class AuthController {
 //		for (c = 'a'; c <= 'z'; ++c) {
 //			System.out.println(c + " ");
 //		}
+
 
 		return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId().intValue(), userDetails.getUsername(),
 				userDetails.getEmail(), roles, userDetails.isActive()));
@@ -177,17 +177,25 @@ public class AuthController {
 		JSONObject json = new JSONObject(email);
 		String fetchedEmail = json.getString("email");
 		User user = userService.findByEmail(fetchedEmail);
+		
 		System.out.println(user);
 		if (user == null || !user.isActive()) {
 			return new ResponseEntity(new NullExceptionHandler("Not Found"), HttpStatus.NOT_FOUND);
 		}
-		Thread newThread = new Thread(() -> {
-			final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort()
-					+ request.getContextPath();
-
-			eventPublisher.publishEvent(new OnResetPasswordEvent(user, appUrl));
-		});
-		newThread.start();
+		
+		else {
+			Thread newThread1 = new Thread(() -> {
+				user.setPasswordResetToken(null);
+				userService.save(user);
+			});
+			newThread1.start();
+			Thread newThread2 = new Thread(() -> {
+				final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort()
+				+ request.getContextPath();
+				eventPublisher.publishEvent(new OnResetPasswordEvent(user, appUrl));
+			});
+			newThread2.start();
+		}
 
 		return ResponseEntity.ok(new MessageResponse("Code has been sent via email"));
 
@@ -212,9 +220,7 @@ public class AuthController {
 	@PostMapping("/resetPassword")
 	public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
 		try {
-			PasswordResetToken passwordResetToken = passwordResetTokenService
-					.findByCode(resetPasswordRequest.getCode());
-			User user = passwordResetToken.getUser();
+			User user = userService.findByEmail(resetPasswordRequest.getEmail());
 			if (user.getEmail().equals(resetPasswordRequest.getEmail())) {
 				String newPassword = resetPasswordRequest.getPassword();
 				user.setPassword(encoder.encode(newPassword));

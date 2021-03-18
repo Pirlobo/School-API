@@ -18,4 +18,6 @@ public interface IPasswordResetTokenService {
 	
 	public PasswordResetToken findByCode(String code);
 	
+	public void deleteAll();
+	
 }

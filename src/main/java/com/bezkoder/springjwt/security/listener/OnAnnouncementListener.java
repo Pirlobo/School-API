@@ -32,20 +32,6 @@ public class OnAnnouncementListener implements ApplicationListener<OnAnnouncemen
 
     @Autowired
     private JavaMailSender mailSender;
-    
-    @Autowired
-    private PasswordResetTokenRepository passwordResetTokenRepository;
-    
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private Environment env;
-    
-    @Autowired
-    private UserService userService;
-
-    // API
 
     @Override
     public void onApplicationEvent(final OnAnnouncementEvent event) {

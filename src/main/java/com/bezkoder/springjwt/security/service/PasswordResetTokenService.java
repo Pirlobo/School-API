@@ -31,4 +31,9 @@ public class PasswordResetTokenService implements IPasswordResetTokenService{
 		return passwordResetToken;
 	}
 
+	@Override
+	public void deleteAll() {
+		passwordResetTokenRepository.deleteAll();
+	}
+
 }

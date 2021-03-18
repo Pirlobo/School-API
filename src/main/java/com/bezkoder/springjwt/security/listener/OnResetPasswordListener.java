@@ -33,15 +33,6 @@ public class OnResetPasswordListener implements ApplicationListener<OnResetPassw
     private JavaMailSender mailSender;
     
     @Autowired
-    private PasswordResetTokenRepository passwordResetTokenRepository;
-    
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private Environment env;
-    
-    @Autowired
     private UserService userService;
 
     // API
@@ -63,7 +54,7 @@ public class OnResetPasswordListener implements ApplicationListener<OnResetPassw
         mailSender.send(email);
     }
 
-    //
+    // 
 
     private SimpleMailMessage constructEmailMessage(final OnResetPasswordEvent event, final User user, final String token, final String code) {
         final String recipientAddress = user.getEmail();

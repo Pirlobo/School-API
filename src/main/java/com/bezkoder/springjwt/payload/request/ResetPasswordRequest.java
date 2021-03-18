@@ -8,10 +8,6 @@ import com.bezkoder.springjwt.models.PasswordResetToken;
 
 public class ResetPasswordRequest {
 	
-	@Size(min = 6, max = 6, message 
-		      = "6 digits")
-	private String code;
-	
 	@Email
 	private String email;
 	
@@ -45,7 +41,6 @@ public class ResetPasswordRequest {
 			@Size(min = 6, max = 40, message = "About Me must be between 6 and 40 characters") String password, String email,
 			@Size(min = 6, max = 40, message = "About Me must be between 6 and 40 characters") String password2) {
 		super();
-		this.code = code;
 		this.email = email;
 		this.password = password;
 		this.password2 = password2;
@@ -54,15 +49,7 @@ public class ResetPasswordRequest {
 	public ResetPasswordRequest() {
 		super();
 	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
+	
 	public String getEmail() {
 		return email;
 	}

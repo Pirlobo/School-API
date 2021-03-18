@@ -87,8 +87,6 @@ public class UserService implements IUserService {
 
 	@Override
 	public void createPasswordResetTokenForUser(User user, String token, String code) {
-		passwordResetTokenRepository.deleteAll();
-		user.setPasswordResetToken(null);
 		PasswordResetToken myToken = new PasswordResetToken(token, user);
 		myToken.setCode(code);
 		passwordResetTokenRepository.save(myToken);
