@@ -13,7 +13,7 @@ import com.bezkoder.springjwt.models.PasswordResetToken;
 import com.bezkoder.springjwt.models.User;
 
 @Repository
-public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Integer> {
+public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
 	@Query(value = "select * from password_reset_token as t where t.token = ?1", nativeQuery = true)
     PasswordResetToken findByToken(String token);
 	

@@ -49,6 +49,7 @@ import com.bezkoder.springjwt.payload.request.SignupRequest;
 import com.bezkoder.springjwt.payload.response.JwtResponse;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.payload.response.ResetPasswordResponse;
+import com.bezkoder.springjwt.persistence.PasswordResetTokenRepository;
 import com.bezkoder.springjwt.security.event.OnAnnouncementEvent;
 import com.bezkoder.springjwt.security.event.OnRegistrationEvent;
 import com.bezkoder.springjwt.security.event.OnResetPasswordEvent;
@@ -80,6 +81,8 @@ public class AuthController {
 	@Autowired
 	private PasswordResetTokenService passwordResetTokenService;
 
+	@Autowired
+	private PasswordResetTokenRepository passwordResetTokenRepository;
 	
 
 	@PostMapping("/signin")
@@ -184,17 +187,12 @@ public class AuthController {
 		}
 		
 		else {
-			Thread newThread1 = new Thread(() -> {
-				user.setPasswordResetToken(null);
-				userService.save(user);
-			});
-			newThread1.start();
-			Thread newThread2 = new Thread(() -> {
+			Thread newThread = new Thread(() -> {
 				final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort()
 				+ request.getContextPath();
 				eventPublisher.publishEvent(new OnResetPasswordEvent(user, appUrl));
 			});
-			newThread2.start();
+			newThread.start();
 		}
 
 		return ResponseEntity.ok(new MessageResponse("Code has been sent via email"));
