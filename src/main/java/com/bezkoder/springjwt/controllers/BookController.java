@@ -31,6 +31,7 @@ import com.bezkoder.springjwt.book.Orders;
 import com.bezkoder.springjwt.dto.BookDto;
 import com.bezkoder.springjwt.dto.BookItemDto;
 import com.bezkoder.springjwt.exceptions.NullExceptionHandler;
+import com.bezkoder.springjwt.exceptions.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.persistence.BookRepository;
@@ -60,8 +61,7 @@ public class BookController {
 		Set<Books> bookSet = bookService.getBookByTitleOrAuthor(keyword);
 
 		if (bookSet.size() == 0) {
-			return ResponseEntity.ok(new MessageResponse("Cant find any book"));
-
+			throw new ResourceNotFoundException("Cant find any book");
 		} else {
 			List<Books> bookList = new ArrayList<>();
 			bookSet.forEach(e -> {
@@ -78,7 +78,7 @@ public class BookController {
 	public ResponseEntity<?> getAllRequiredBooks(@PathVariable String userName) {
 		Set<Books> bookList = courseService.getAllRequiredBooks(userName);
 		if (bookList.size() == 0) {
-			return new ResponseEntity(new NullExceptionHandler("You have no required materials"), HttpStatus.NOT_FOUND);
+			throw new ResourceNotFoundException("Cant find any book");
 		}
 		// 	Key : Course's title
 		// Value : List of Books required for the course/s

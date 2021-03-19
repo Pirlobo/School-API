@@ -36,6 +36,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.exceptions.NullExceptionHandler;
+import com.bezkoder.springjwt.exceptions.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.ERole;
 import com.bezkoder.springjwt.models.PasswordResetToken;
 import com.bezkoder.springjwt.models.Role;
@@ -80,10 +81,6 @@ public class AuthController {
 
 	@Autowired
 	private PasswordResetTokenService passwordResetTokenService;
-
-	@Autowired
-	private PasswordResetTokenRepository passwordResetTokenRepository;
-	
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest req) {
@@ -183,7 +180,7 @@ public class AuthController {
 		
 		System.out.println(user);
 		if (user == null || !user.isActive()) {
-			return new ResponseEntity(new NullExceptionHandler("Not Found"), HttpStatus.NOT_FOUND);
+			throw new ResourceNotFoundException("Cant find any user to send email");
 		}
 		
 		else {
@@ -205,12 +202,11 @@ public class AuthController {
 			JSONObject json = new JSONObject(code);
 			String fetchedCode = json.getString("code");
 			PasswordResetToken passwordResetToken = passwordResetTokenService.findByCode(fetchedCode);
-			System.out.println(fetchedCode);
 			User user = passwordResetToken.getUser();
 
 			return ResponseEntity.ok(new StudentDto(fetchedCode, user.getEmail(), user.getUsername()));
 		} catch (Exception e) {
-			return new ResponseEntity(new NullExceptionHandler("Not Found"), HttpStatus.NOT_FOUND);
+			throw new NullExceptionHandler("CODE CANT NOT BE FOUND");
 		}
 
 	}
