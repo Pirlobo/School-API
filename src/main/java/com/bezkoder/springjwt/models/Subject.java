@@ -44,6 +44,17 @@ public class Subject {
 	private Subject prerequisite;
 	
 	
+private String description;
+	
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	public Subject getPrerequisite() {
 		return prerequisite;
 	}
@@ -93,12 +104,13 @@ public class Subject {
 		course.setSubject(this);
 	}
 
-	public Subject(Integer id, SubjectName subjectName, SubjectCode subjectCode, Subject prerequisite) {
+	public Subject(Integer id, SubjectName subjectName, SubjectCode subjectCode, Subject prerequisite, String description) {
 		super();
 		this.id = id;
 		this.subjectName = subjectName;
 		this.subjectCode = subjectCode;
 		this.prerequisite = prerequisite;
+		this.description = description;
 	}
 	
 }

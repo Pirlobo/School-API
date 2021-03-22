@@ -24,7 +24,7 @@ import com.bezkoder.springjwt.payload.response.ResponseFile;
 import com.bezkoder.springjwt.security.service.FileStorageService;
 
 @RestController
-@RequestMapping("/api/student")
+@RequestMapping("/api")
 @CrossOrigin("http://localhost:8081")
 public class FileController {
 

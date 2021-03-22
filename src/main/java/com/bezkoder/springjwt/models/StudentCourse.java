@@ -39,6 +39,18 @@ public class StudentCourse {
 	private GPA gpa;
 
 	private Integer percentage;
+	
+	private Integer waitlistedRank;
+
+	public Integer getWaitlistedRank() {
+		return waitlistedRank;
+	}
+
+	public void setWaitlistedRank(Integer waitlistedRank) {
+		this.waitlistedRank = waitlistedRank;
+	}
+
+
 
 	@Enumerated(EnumType.STRING)
 	private IsPassed isPassed;
@@ -55,6 +67,7 @@ public class StudentCourse {
 		this.percentage = percentage;
 	}
 
+	
 	
 
 	public IsPassed getIsPassed() {
@@ -127,7 +140,7 @@ public class StudentCourse {
 		this.user = user;
 		this.course = course; 
 		this.userCourseId = new StudentCourseId(user.getId(), course.getRegId());
-		this.isPassed = isPassed.FALSE;
+		this.isPassed = isPassed.TRUE;
 
 	}
 

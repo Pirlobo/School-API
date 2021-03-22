@@ -31,6 +31,29 @@ public class CourseDto {
 	private String prerequisite;
 	
 	private String term;
+	
+	private String courseDescription;
+	
+	private String year;
+	
+	
+	
+
+	public String getYear() {
+		return year;
+	}
+
+	public void setYear(String year) {
+		this.year = year;
+	}
+
+	public String getCourseDescription() {
+		return courseDescription;
+	}
+
+	public void setCourseDescription(String courseDescription) {
+		this.courseDescription = courseDescription;
+	}
 
 	public Integer getRegId() {
 		return regId;
@@ -139,7 +162,7 @@ public class CourseDto {
 	}
 
 	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
-			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite, String term) {
+			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite, String term, String courseDescription, String year) {
 		super();
 		this.regId = regId;
 		this.section = section;
@@ -155,6 +178,8 @@ public class CourseDto {
 		this.to = to;
 		this.prerequisite = prerequisite;
 		this.term = term;
+		this.courseDescription = courseDescription;
+		this.year = year;
 	}
 
 	public String getTerm() {

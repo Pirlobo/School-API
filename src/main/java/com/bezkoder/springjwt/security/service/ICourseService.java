@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.bezkoder.springjwt.book.Books;
 import com.bezkoder.springjwt.dto.BookDto;
 import com.bezkoder.springjwt.dto.CourseDto;
+import com.bezkoder.springjwt.dto.CourseStudentDto;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.RegisterRequest;
@@ -92,9 +93,9 @@ public interface ICourseService {
 	// check at least one class is selected in order to register
 	public boolean isAnyCourseSelected(List<Integer> regIdClasses);
 
-	
+	List<Course> findAll();
 
-		
+	List<CourseStudentDto> courseToCourseStudentDtos(Integer regId);
 
 }
 

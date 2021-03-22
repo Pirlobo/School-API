@@ -22,6 +22,7 @@ import org.thymeleaf.model.IStandaloneElementTag;
 
 import com.bezkoder.springjwt.book.Books;
 import com.bezkoder.springjwt.dto.CourseDto;
+import com.bezkoder.springjwt.dto.CourseStudentDto;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.IsPassed;
 import com.bezkoder.springjwt.models.StudentCourse;
@@ -42,9 +43,6 @@ public class CourseService implements ICourseService {
 
 	@Autowired
 	private CourseRepository courseRepository;
-
-	@Autowired
-	private BookRepository bookRepository;
 
 	@Autowired
 	private UserService userService;
@@ -75,10 +73,12 @@ public class CourseService implements ICourseService {
 			} catch (Exception e2) {
 				prerequisite = "None";
 			}
+			
+			
 			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
 					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
 					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
-					e.getTerm().getSemester().toString());
+					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), null);
 			resultSet.add(courseDto);
 		});
 		return resultSet;
@@ -476,14 +476,33 @@ public class CourseService implements ICourseService {
 			} catch (Exception ex) {
 				prerequisite = "None";
 			}
+			String term_year = e.getStartDay().toString().substring(0, 4);
 			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
 					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
 					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
-					e.getTerm().getSemester().toString());
+					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), term_year);
 			courseDtos.add(courseDto);
 		});
 		return courseDtos;
 
+	}
+
+	@Override
+	public List<Course> findAll() {
+		List<Course> courses = courseRepository.findAll();
+		return courses;
+	}
+
+	@Override
+	public List<CourseStudentDto> courseToCourseStudentDtos(Integer regId) {
+		Course course = courseService.findCourseById(regId);
+		List<StudentCourse> studentCourseList = course.getUsers();
+		List<CourseStudentDto> courseStudentDtos = new ArrayList<CourseStudentDto>();
+		studentCourseList.forEach(e -> {
+			CourseStudentDto courseStudentDto = new CourseStudentDto(e.getUser().getUsername(), e.getUser().getEmail(), e.getUserCourseStatus().toString(), e.getCourse().getSubject().getSubjectCode().toString(), e.getCourse().getSubject().getDescription(), e.getWaitlistedRank(), e.getCourse().getCapacity(), e.getCourse().getAvailable());
+			courseStudentDtos.add(courseStudentDto);
+		});
+		return courseStudentDtos;
 	}
 
 }

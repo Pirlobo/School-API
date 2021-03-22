@@ -52,6 +52,9 @@ public class Course {
 	@JsonIgnore
 	private Term term;
 	
+	
+	
+
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //	@JoinTable(name = "course_books",
 //	joinColumns = { @JoinColumn(name = "fk_course") },

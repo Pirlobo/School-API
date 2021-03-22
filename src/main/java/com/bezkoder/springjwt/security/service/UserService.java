@@ -119,6 +119,7 @@ public class UserService implements IUserService {
 		for (int i = 0; i < courses.size(); i++) {
 			if (courseService.isAlaivable(courses.get(i))) {
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
+				userCourse.setWaitlistedRank(0);
 				userCourse.setUserCourseStatus(StudentCourseStatus.Successfull);
 				courseService.setAvailable(courses.get(i).getAvailable() - 1, courses.get(i).getRegId());
 				userCourseRepository.save(userCourse);
@@ -126,6 +127,7 @@ public class UserService implements IUserService {
 			} else {
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
 				userCourse.setUserCourseStatus(StudentCourseStatus.Wailisted);
+				userCourse.setWaitlistedRank(courses.get(i).getWaitlist() + 1);
 				courseService.setWailist(courses.get(i).getWaitlist() + 1, courses.get(i).getRegId());
 				userCourseRepository.save(userCourse);
 
