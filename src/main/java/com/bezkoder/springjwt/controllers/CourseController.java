@@ -2,6 +2,8 @@ package com.bezkoder.springjwt.controllers;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import javax.servlet.http.HttpServletRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,9 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bezkoder.springjwt.book.Books;
 import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.models.Course;
+import com.bezkoder.springjwt.models.StudentCourse;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.RegisterRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
+import com.bezkoder.springjwt.persistence.StudentCourseRepository;
 import com.bezkoder.springjwt.security.service.CalendarService;
 import com.bezkoder.springjwt.security.service.CourseService;
 import com.bezkoder.springjwt.security.service.UserService;
@@ -38,6 +42,7 @@ public class CourseController {
 	private CalendarService calendarService;
 	
 	@Autowired UserService userService;
+	
 
 	@RequestMapping("/searchCoursesByTitle/{title}")
 //	@CacheEvict(value = "courseCache", key = "#result.title", beforeInvocation = true)
@@ -53,7 +58,7 @@ public class CourseController {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> registerForClasses(@RequestBody String userName, RegisterRequest regIdClasses) {
+	public ResponseEntity<?> registerForClasses(@RequestBody String userName, RegisterRequest regIdClasses) throws InterruptedException {
 		JSONObject json = new JSONObject(userName);
 		JSONArray jsonArray = json.getJSONArray("regIdClasses");
 		

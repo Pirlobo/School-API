@@ -26,12 +26,14 @@ import com.bezkoder.springjwt.dto.CourseStudentDto;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.IsPassed;
 import com.bezkoder.springjwt.models.StudentCourse;
+import com.bezkoder.springjwt.models.StudentCourseId;
 import com.bezkoder.springjwt.models.StudentCourseStatus;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.RegisterRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.persistence.BookRepository;
 import com.bezkoder.springjwt.persistence.CourseRepository;
+import com.bezkoder.springjwt.persistence.StudentCourseRepository;
 import com.bezkoder.springjwt.persistence.UserRepository;
 import com.google.common.collect.Lists;
 
@@ -52,6 +54,9 @@ public class CourseService implements ICourseService {
 	
 	@Autowired
 	CourseService courseService;
+	
+	@Autowired
+	private StudentCourseRepository studentCourseRepository;
 
 	@Override
 	public Course findCourseById(Integer id) {
@@ -465,23 +470,32 @@ public class CourseService implements ICourseService {
 
 	@Override
 	public List<CourseDto> coursesToCourseDtos(List<Course> courses) {
-
+		User user = userService.getCurrentLoggedUser();
 		List<CourseDto> courseDtos = new ArrayList<CourseDto>();
 		courses.forEach(e -> {
 			String from = e.getCalendars().get(0).getStartTime().toString().substring(0, 5);
 			String to = e.getCalendars().get(0).getEndTime().toString().substring(0, 5);
 			String prerequisite;
+			StudentCourse studentCourse = null;
+			String registerStatus = null;
 			try {
 				prerequisite = e.getSubject().getPrerequisite().getSubjectCode().toString();
 			} catch (Exception ex) {
 				prerequisite = "None";
 			}
+			StudentCourseId studentCourseId = new StudentCourseId(user.getId(), e.getRegId());
+			studentCourse = studentCourseRepository.findById(studentCourseId).orElse(null);
+//			studentCourse = studentCourseRepository.findStudentCourseById(user.getId(), e.getRegId());
+			if (studentCourse != null) {
+				registerStatus = studentCourse.getUserCourseStatus().toString();
+			}
 			String term_year = e.getStartDay().toString().substring(0, 4);
 			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
 					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
 					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
-					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), term_year);
+					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), term_year, registerStatus);
 			courseDtos.add(courseDto);
+			
 		});
 		return courseDtos;
 

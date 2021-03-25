@@ -10,10 +10,7 @@ public class StudentCourseId implements Serializable {
 	
 	private Long id;
 	
-	
 	private Integer regId;
-
-	
 
 	public Integer getRegId() {
 		return regId;

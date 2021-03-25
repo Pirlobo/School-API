@@ -36,8 +36,18 @@ public class CourseDto {
 	
 	private String year;
 	
+	String registerStatus;
 	
 	
+	
+
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
+	}
 
 	public String getYear() {
 		return year;
@@ -161,6 +171,28 @@ public class CourseDto {
 		this.prerequisite = prerequisite;
 	}
 
+	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
+			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite, String term, String courseDescription, String year, String registerStatus) {
+		super();
+		this.regId = regId;
+		this.section = section;
+		this.available = available;
+		this.capacity = capacity;
+		this.startDay = startDay;
+		this.endDay = endDay;
+		this.waitlist = waitlist;
+		this.title = title;
+		this.room = room;
+		this.instructor = instructor;
+		this.from = from;
+		this.to = to;
+		this.prerequisite = prerequisite;
+		this.term = term;
+		this.courseDescription = courseDescription;
+		this.year = year;
+		this.registerStatus = registerStatus;
+	}
+	
 	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
 			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite, String term, String courseDescription, String year) {
 		super();

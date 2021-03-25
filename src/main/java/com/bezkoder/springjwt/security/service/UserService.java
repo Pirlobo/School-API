@@ -13,9 +13,11 @@ import java.util.Set;
 import javax.transaction.Transactional;
 
 import org.apache.naming.java.javaURLContextFactory;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +36,8 @@ import com.bezkoder.springjwt.models.StudentCourseId;
 import com.bezkoder.springjwt.models.StudentCourseStatus;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.models.VerificationToken;
+import com.bezkoder.springjwt.payload.request.EditProfileRequest;
+import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.persistence.CourseRepository;
 import com.bezkoder.springjwt.persistence.PasswordResetTokenRepository;
 import com.bezkoder.springjwt.persistence.UserCourseRepository;
@@ -118,6 +122,7 @@ public class UserService implements IUserService {
 	public void registerForClassess(User user, List<Course> courses) {
 		for (int i = 0; i < courses.size(); i++) {
 			if (courseService.isAlaivable(courses.get(i))) {
+			System.out.println(user.getEmail());
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
 				userCourse.setWaitlistedRank(0);
 				userCourse.setUserCourseStatus(StudentCourseStatus.Successfull);
@@ -143,7 +148,7 @@ public class UserService implements IUserService {
 
 		if (principal instanceof UserDetailsImpl) {
 			userName = ((UserDetails) principal).getUsername();
-			User user = userRepository.findByEmail(userName).orElse(null);
+			User user = userRepository.findByUsername(userName).orElse(null);
 			return user;
 		}
 		return null;
@@ -156,10 +161,10 @@ public class UserService implements IUserService {
 		try {
 			List<StudentCourse> userCourses = user.getCourses();
 			userCourses.forEach(e -> {
-				if (e.getUserCourseStatus().equals(StudentCourseStatus.Successfull)) {
-					yourClasses.add(e.getCourse());
-				}
-
+//				if (e.getUserCourseStatus().equals(StudentCourseStatus.Successfull)) {
+//					yourClasses.add(e.getCourse());
+//				}
+				yourClasses.add(e.getCourse());
 			});
 		} catch (Exception e) {
 			return yourClasses;
@@ -275,6 +280,23 @@ public class UserService implements IUserService {
 		User teacher = userRepository.findByEmail("bonguyens2001@gmail.com").orElse(null);
 		users.remove(teacher);
 		return users;
+	}
+
+	@Override
+	public ResponseEntity<?> editProfile(EditProfileRequest editProfileRequest) {
+		User user = userService.getCurrentLoggedUser();
+		JSONObject json = new JSONObject(editProfileRequest);
+		String email = (String) json.get("email");
+		System.out.println(email);
+		User user2 = userService.findByEmail(email);
+ 		if (user2 != null) {
+ 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+		} else {
+			user.setEmail(email); 
+			userService.save(user);
+			return ResponseEntity.ok(new MessageResponse("Saved"));
+		}
+		
 	}
 
 }
