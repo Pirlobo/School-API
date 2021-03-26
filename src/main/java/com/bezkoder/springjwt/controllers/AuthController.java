@@ -215,16 +215,18 @@ public class AuthController {
 	public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
 		try {
 			User user = userService.findByEmail(resetPasswordRequest.getEmail());
-			if (user.getEmail().equals(resetPasswordRequest.getEmail())) {
+			String code = user.getPasswordResetToken().getCode();
+			String codeFromRequest = resetPasswordRequest.getCode();
+			if (user != null && code.equals(codeFromRequest)) {
 				String newPassword = resetPasswordRequest.getPassword();
 				user.setPassword(encoder.encode(newPassword));
 				userService.save(user);
 				return ResponseEntity.ok(new MessageResponse("Saved"));
 			} else {
-				return ResponseEntity.ok(new MessageResponse("Not Found"));
+				throw new ResourceNotFoundException("Resource Not Found");
 			}
 		} catch (Exception e) {
-			return ResponseEntity.ok(new MessageResponse("Not Found"));
+			throw new ResourceNotFoundException("Resource Not Found");
 		}
 	}
 

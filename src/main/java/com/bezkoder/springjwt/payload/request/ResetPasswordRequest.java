@@ -5,12 +5,25 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 import com.bezkoder.springjwt.models.PasswordResetToken;
+import com.sun.istack.NotNull;
 
 public class ResetPasswordRequest {
 	
 	@Email
 	private String email;
 	
+	@NotNull
+	@Size(min = 6 , max = 6)
+	private String code;
+	
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	@Size(min = 6, max = 40, message 
 		      = "About Me must be between 6 and 40 characters")
 	private String password ;
@@ -35,13 +48,14 @@ public class ResetPasswordRequest {
 		this.password2 = password2;
 	}
 
-	
 
-	public ResetPasswordRequest(@Email String code,
-			@Size(min = 6, max = 40, message = "About Me must be between 6 and 40 characters") String password, String email,
+
+	public ResetPasswordRequest(@Email String email, @Size(min = 6, max = 6) String code,
+			@Size(min = 6, max = 40, message = "About Me must be between 6 and 40 characters") String password,
 			@Size(min = 6, max = 40, message = "About Me must be between 6 and 40 characters") String password2) {
 		super();
 		this.email = email;
+		this.code = code;
 		this.password = password;
 		this.password2 = password2;
 	}
