@@ -53,6 +53,7 @@ public interface ICourseService {
 
 	// set waitist
 	void setWailist(Integer wailist, Integer id);
+	
 
 	// get all selected courses can not be registered 
 	Set<Course> getFailedRegisteredClasses(User user, List<Course> courses, List<Integer> regIdClasses);

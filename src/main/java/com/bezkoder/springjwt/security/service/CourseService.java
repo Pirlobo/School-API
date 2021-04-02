@@ -9,6 +9,8 @@ import java.util.Set;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.noneDSA;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -57,6 +59,9 @@ public class CourseService implements ICourseService {
 	
 	@Autowired
 	private StudentCourseRepository studentCourseRepository;
+	
+	@Autowired
+	private UserCourseService userCourseService;
 
 	@Override
 	public Course findCourseById(Integer id) {
@@ -478,28 +483,31 @@ public class CourseService implements ICourseService {
 			String prerequisite;
 			StudentCourse studentCourse = null;
 			String registerStatus = null;
+			Integer registerRank = null;
 			try {
 				prerequisite = e.getSubject().getPrerequisite().getSubjectCode().toString();
 			} catch (Exception ex) {
 				prerequisite = "None";
 			}
 			StudentCourseId studentCourseId = new StudentCourseId(user.getId(), e.getRegId());
-			studentCourse = studentCourseRepository.findById(studentCourseId).orElse(null);
-//			studentCourse = studentCourseRepository.findStudentCourseById(user.getId(), e.getRegId());
+			studentCourse = userCourseService.findById(studentCourseId);
+			System.out.println(user.getId());
 			if (studentCourse != null) {
 				registerStatus = studentCourse.getUserCourseStatus().toString();
+				registerRank = studentCourse.getWaitlistedRank();
 			}
 			String term_year = e.getStartDay().toString().substring(0, 4);
 			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
 					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
 					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
-					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), term_year, registerStatus);
+					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), term_year, registerStatus, registerRank);
 			courseDtos.add(courseDto);
 			
 		});
 		return courseDtos;
 
 	}
+
 
 	@Override
 	public List<Course> findAll() {

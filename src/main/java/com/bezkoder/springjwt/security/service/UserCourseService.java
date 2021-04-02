@@ -27,6 +27,7 @@ public class UserCourseService implements IUserCourseService {
 
 	@Override
 	public void delete(StudentCourse userCourse) {
+		System.out.println(userCourse.getUserCourseStatus() + "Status");
 		userCourseRepository.delete(userCourse);
 		
 	}

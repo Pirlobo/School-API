@@ -94,8 +94,6 @@ public class User{
 		this.roles = roles;
 		this.isActive = false;
 	}
-
-
 	
 	 @OneToMany(
 		        mappedBy = "user",

@@ -40,6 +40,7 @@ import com.bezkoder.springjwt.payload.request.EditProfileRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.persistence.CourseRepository;
 import com.bezkoder.springjwt.persistence.PasswordResetTokenRepository;
+import com.bezkoder.springjwt.persistence.StudentCourseRepository;
 import com.bezkoder.springjwt.persistence.UserCourseRepository;
 import com.bezkoder.springjwt.persistence.UserRepository;
 import com.bezkoder.springjwt.persistence.VerificationTokenRepository;
@@ -79,6 +80,9 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private OrderService orderService;
+	
+	@Autowired
+	private StudentCourseRepository studentCourseRepository;
 	
 
 	@Override
@@ -124,7 +128,7 @@ public class UserService implements IUserService {
 			if (courseService.isAlaivable(courses.get(i))) {
 			System.out.println(user.getEmail());
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
-				userCourse.setWaitlistedRank(0);
+				userCourse.setWaitlistedRank(courses.get(i).getWaitlist() + 1);
 				userCourse.setUserCourseStatus(StudentCourseStatus.Successfull);
 				courseService.setAvailable(courses.get(i).getAvailable() - 1, courses.get(i).getRegId());
 				userCourseRepository.save(userCourse);
@@ -132,7 +136,7 @@ public class UserService implements IUserService {
 			} else {
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
 				userCourse.setUserCourseStatus(StudentCourseStatus.Wailisted);
-				userCourse.setWaitlistedRank(courses.get(i).getWaitlist() + 1);
+				userCourse.setWaitlistedRank(courses.get(i).getCapacity() + courses.get(i).getWaitlist() + 1);
 				courseService.setWailist(courses.get(i).getWaitlist() + 1, courses.get(i).getRegId());
 				userCourseRepository.save(userCourse);
 
@@ -173,6 +177,7 @@ public class UserService implements IUserService {
 
 	}
 
+
 	@Override
 	public List<CourseDto> dropClasses(User user, List<Integer> regIdClasses) {
 		List<Course> droppedClasses = courseService.findRegisteredClasses(regIdClasses);
@@ -188,15 +193,39 @@ public class UserService implements IUserService {
 			StudentCourse userCourse = userCourseService.findById(e);
 			userCourses.add(userCourse);
 		});
+		
 		userCourses.forEach(e -> {
-			courseService.setAvailable(e.getCourse().getAvailable() + 1, e.getCourse().getRegId());
-			userCourseService.delete(e);
+			if (e.getCourse().getWaitlist() <= 0) {
+				List<StudentCourse> afterRankList = studentCourseRepository.findAfterRank(e.getWaitlistedRank());
+				afterRankList.forEach(studentCourse -> {
+					studentCourse.setWaitlistedRank(studentCourse.getWaitlistedRank() - 1);
+				});
+				studentCourseRepository.saveAll(afterRankList);
+				
+				courseService.setAvailable(e.getCourse().getAvailable() + 1, e.getCourse().getRegId());
+				courseService.save(e.getCourse());
+				userCourseService.delete(e);
+			} else {
+				List<StudentCourse> afterRankList = studentCourseRepository.findAfterRank(e.getWaitlistedRank());
+				afterRankList.forEach(studentCourse -> {
+					studentCourse.setWaitlistedRank(studentCourse.getWaitlistedRank() - 1);
+					if (studentCourse.getWaitlistedRank() <= e.getCourse().getCapacity()) {
+						studentCourse.setUserCourseStatus(StudentCourseStatus.Successfull);
+					}
+				});
+				studentCourseRepository.saveAll(afterRankList);
+				courseService.setWailist(e.getCourse().getWaitlist() - 1, e.getCourse().getRegId());
+				courseService.save(e.getCourse());
+				userCourseService.delete(e);
+				
+			}
 
 		});
 		List<CourseDto> resultSet = courseService.coursesToCourseDtos(droppedClasses);
 		return resultSet;
 
 	}
+
 
 	@Override
 	public Orders placeOrder(List<BookItemDto> bookItemDto) {

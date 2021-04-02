@@ -105,6 +105,8 @@ public class CourseController {
 		String fetchUserName = json.getString("userName"); 
 		List<Integer> reg_ids =  courseService.convertJsonArrayCoursesToRegIds(jsonArray);
 	    User user = userService.findByUsername(fetchUserName);
+	    System.out.println(user.getEmail());
+	    System.out.println(reg_ids.size());
 		List<CourseDto> droppedClasses = userService.dropClasses(user, reg_ids);
 		return ResponseEntity.ok(droppedClasses);
 	}
