@@ -1,6 +1,6 @@
 package com.bezkoder.springjwt.controllers;
-
 import java.util.ArrayList;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bezkoder.springjwt.book.Books;
@@ -35,6 +36,7 @@ import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.security.event.OnAnnouncementEvent;
 import com.bezkoder.springjwt.security.service.CalendarService;
 import com.bezkoder.springjwt.security.service.CourseService;
+import com.bezkoder.springjwt.security.service.TeacherService;
 import com.bezkoder.springjwt.security.service.UserService;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -48,6 +50,9 @@ public class TeacherController {
 	
 	@Autowired
 	private ApplicationEventPublisher eventPublisher;
+	
+	@Autowired
+	private TeacherService teacherService;
 	
 	@GetMapping("/manageCourses")
 	@Cacheable(value = "courseCache")
@@ -68,11 +73,29 @@ public class TeacherController {
 		
 		return ResponseEntity.ok(new MessageResponse("Sent"));
 	}
+	@PostMapping("/drop")
+	public ResponseEntity<?> dropClasses(@RequestBody String dropClassesRequest) {
+		JSONObject json = new JSONObject(dropClassesRequest);
+		JSONArray jsonArray = json.getJSONArray("userName");
+		String fetchedRegId = json.getString("regId"); 
+		List<User> users = new ArrayList<>();
+		jsonArray.forEach(e -> {
+			User user = userService.findByUsername(e.toString());
+			users.add(user);
+		});
+		int id = Integer.parseInt(fetchedRegId);  
+		List<StudentCourse> studentCourses = teacherService.dropClasses(users, id);
+		return ResponseEntity.ok(studentCourses);
+	}
+	
 	@GetMapping("/studentInfo/{regId}")
 	public ResponseEntity<?> sendAnnounement(@PathVariable Integer regId) {
 		List<CourseStudentDto> courseStudentDtos = courseService.courseToCourseStudentDtos(regId);
 		return ResponseEntity.ok(courseStudentDtos);
 	}
+	
+	
+	
 	
 	static String[] addElement(String[] a, String... e) {
 	    String[] temptArray  = new String [a.length + e.length];
@@ -82,6 +105,7 @@ public class TeacherController {
 		}
 	    return temptArray;
 	}
+	
 	
 
 }

@@ -21,12 +21,13 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     List<Course> findByTitle(Integer year, String title);
    
     @Modifying
-	@Query(value = "UPDATE `school`.`course` SET `available` = ?1 WHERE (`id` = ?2);", nativeQuery = true)
+	@Query(value =  "UPDATE school.course as c SET c.available = ?1 WHERE c.id = ?2" , nativeQuery = true)
+    
     void setAvailable(Integer available, Integer id);
     
     @Modifying
-   	@Query(value = "UPDATE `school`.`course` SET `waitlist` = ?1 WHERE (`id` = ?2);", nativeQuery = true)
-       void setWailist(Integer waitlist, Integer id);
+   	@Query(value =  "UPDATE school.course as c SET c.waitlist = ?1 WHERE c.id = ?2", nativeQuery = true)
+       void setWailist(Integer waitlist, Integer id); 
     
     @Modifying
    	@Query(value = "select * from course as c inner join subject as s on c.subject_id = s.id where s.subject_name= ?1", nativeQuery = true)
