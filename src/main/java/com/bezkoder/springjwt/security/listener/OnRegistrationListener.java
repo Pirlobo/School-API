@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
@@ -28,8 +29,8 @@ public class OnRegistrationListener implements ApplicationListener<OnRegistratio
     @Autowired
     private JavaMailSender mailSender;
 
-    @Autowired
-    private Environment env;
+    @Value("${spring.mail.username}")
+	private String email;
 
     // API
 
@@ -55,11 +56,10 @@ public class OnRegistrationListener implements ApplicationListener<OnRegistratio
         final String subject = "Registration Confirmation";
         final String confirmationUrl = event.getAppUrl() + "/api/auth/registrationConfirm?token=" + token;
         final SimpleMailMessage email = new SimpleMailMessage();
-        String [] recipientAddresseStrings = {recipientAddress, "tiepga763@gmail.com"};
-        email.setTo(recipientAddresseStrings);
+        email.setTo(recipientAddress);
         email.setSubject(subject);
         email.setText("Please open the following URL to verify your account: \r\n" + confirmationUrl);
-        email.setFrom("bonguyens2001@gmail.com");
+        email.setFrom(this.email);
         return email;
     }
 
