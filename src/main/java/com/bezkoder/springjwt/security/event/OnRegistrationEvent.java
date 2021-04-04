@@ -16,6 +16,7 @@ public class OnRegistrationEvent extends ApplicationEvent {
     
     private final User user;
 
+
     public OnRegistrationEvent(final User user, final String appUrl) {
         super(user);
         this.user = user;

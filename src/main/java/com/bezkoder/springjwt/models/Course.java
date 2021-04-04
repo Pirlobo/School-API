@@ -52,8 +52,21 @@ public class Course {
 	@JsonIgnore
 	private Term term;
 	
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "course")
+	private List<FileDB> files;
+
 	
-	
+
+
+	public List<FileDB> getFiles() {
+		return files;
+	}
+
+	public void setFiles(List<FileDB> files) {
+		this.files = files;
+	}
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //	@JoinTable(name = "course_books",
@@ -264,5 +277,9 @@ public class Course {
 		this.regId = regId;
 	}
 	
+	public void addFile(FileDB file) {
+		files.add( file );
+		file.setCourse(this);
+	}
 
 }

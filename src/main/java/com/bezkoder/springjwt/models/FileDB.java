@@ -25,23 +25,26 @@ public class FileDB {
 
   private String type;
   
-  public User getUser() {
-	return user;
-}
-
-public void setUser(User user) {
-	this.user = user;
-}
 
 public void setId(String id) {
 	this.id = id;
 }
 
-@ManyToOne
+  @ManyToOne
   @JsonIgnore
-  private User user;
+  private Course course;
 
-  @Lob
+
+
+  public Course getCourse() {
+	return course;
+}
+
+public void setCourse(Course course) {
+	this.course = course;
+}
+
+@Lob
   private byte[] data;
 
   public FileDB() {

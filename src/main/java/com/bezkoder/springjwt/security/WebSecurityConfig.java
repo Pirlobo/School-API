@@ -80,7 +80,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers("/api/teacher/**").hasAnyAuthority("ROLE_TEACHER")
 			.antMatchers("/api/book/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER")
 			.antMatchers("/api/student/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER")
-			.antMatchers("/api/student/upload").hasAnyAuthority("ROLE_TEACHER")
 			.antMatchers("/api/auth/sendEmail").hasAnyAuthority("ROLE_TEACHER", "ROLE_USER")
 			.anyRequest().authenticated();
 		

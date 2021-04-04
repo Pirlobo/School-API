@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.FileDB;
 import com.bezkoder.springjwt.models.User;
+import com.bezkoder.springjwt.persistence.CourseRepository;
 import com.bezkoder.springjwt.persistence.FileDBRepository;
 import com.bezkoder.springjwt.persistence.UserRepository;
 
@@ -21,13 +23,14 @@ public class FileStorageService {
   private FileDBRepository fileDBRepository;
   
   @Autowired
-  private UserRepository userRepository;
+  private CourseRepository courseRepository;
 
-  public FileDB store(MultipartFile file) throws IOException {
+  public FileDB store(MultipartFile file, Integer regId) throws IOException {
     String fileName = StringUtils.cleanPath(file.getOriginalFilename());
     FileDB FileDB = new FileDB(fileName, file.getContentType(), file.getBytes());
-    User user = userRepository.findByEmail("bonguyens2001@gmail.com").orElse(null); 
-    FileDB.setUser(user);
+    Course course = courseRepository.findById(regId).orElse(null);
+    course.addFile(FileDB);
+    courseRepository.save(course);
     return fileDBRepository.save(FileDB);
   }
 
@@ -35,7 +38,7 @@ public class FileStorageService {
     return fileDBRepository.findById(id).get();
   }
   
-  public Stream<FileDB> getAllFiles() {
-    return fileDBRepository.findAll().stream();
+  public Stream<FileDB> getAllFilesById(Integer id) {
+    return fileDBRepository.getAllFilesByCourseId(id).stream();
   }
 }

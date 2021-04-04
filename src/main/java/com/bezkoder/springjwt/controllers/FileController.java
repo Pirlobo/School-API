@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.FileDB;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.payload.response.ResponseFile;
+import com.bezkoder.springjwt.security.service.CourseService;
 import com.bezkoder.springjwt.security.service.FileStorageService;
 
 @RestController
@@ -32,11 +34,10 @@ public class FileController {
   private FileStorageService storageService;
 
   @PostMapping("/upload")
-  public ResponseEntity<MessageResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+  public ResponseEntity<MessageResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("regId") Integer regId) {
     String message = "";
     try {
-      storageService.store(file);
-
+      storageService.store(file, regId);
       message = "Uploaded the file successfully: " + file.getOriginalFilename();
       return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));
     } catch (Exception e) {
@@ -45,9 +46,10 @@ public class FileController {
     }
   }
 
-  @GetMapping("/files")
-  public ResponseEntity<List<ResponseFile>> getListFiles() {
-    List<ResponseFile> files = storageService.getAllFiles().map(dbFile -> {
+//  @GetMapping("/files/{regId}")
+  @GetMapping(value = "/getFiles/{regId}")
+  public ResponseEntity<List<ResponseFile>> getListFiles(@PathVariable("regId") Integer regId) {
+    List<ResponseFile> files = storageService.getAllFilesById(regId).map(dbFile -> {
       String fileDownloadUri = ServletUriComponentsBuilder
           .fromCurrentContextPath()
           .path("/files/")

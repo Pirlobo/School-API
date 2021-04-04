@@ -38,24 +38,6 @@ public class User{
 	@Column(unique = true)
 	private String username;
 	private boolean isActive;
-	
-	@JsonIgnore
-	@OneToMany(mappedBy = "user")
-	private List<FileDB> files;
-
-	
-
-
-
-	public List<FileDB> getFiles() {
-		return files;
-	}
-
-	public void setFiles(List<FileDB> files) {
-		this.files = files;
-	}
-
-
 
 	@JsonIgnore
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
