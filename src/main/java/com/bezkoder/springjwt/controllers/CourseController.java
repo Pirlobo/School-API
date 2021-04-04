@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -89,11 +90,9 @@ public class CourseController {
 
 	}
 	
-	@PostMapping("/getRegisteredClasses")
-	public ResponseEntity<?> getRegisteredClasses(@RequestBody String userName) {
-		JSONObject json = new JSONObject(userName);
-		String fetchUserName = json.getString("userName");
-	    User user = userService.findByUsername(fetchUserName);
+	@GetMapping("/getRegisteredClasses")
+	public ResponseEntity<?> getRegisteredClasses() {
+	    User user = userService.getCurrentLoggedUser();
 		List<Course> registeredCourses = userService.getYourClasses(user);
 		List<CourseDto> courseDtos = courseService.coursesToCourseDtos(registeredCourses);
 		return ResponseEntity.ok(courseDtos);
