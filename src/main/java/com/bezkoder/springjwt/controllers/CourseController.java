@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bezkoder.springjwt.book.Books;
 import com.bezkoder.springjwt.dto.CourseDto;
+import com.bezkoder.springjwt.exceptions.NullExceptionHandler;
+import com.bezkoder.springjwt.exceptions.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.StudentCourse;
 import com.bezkoder.springjwt.models.User;
@@ -44,6 +46,7 @@ import com.bezkoder.springjwt.security.service.CalendarService;
 import com.bezkoder.springjwt.security.service.CourseService;
 import com.bezkoder.springjwt.security.service.PaginationService;
 import com.bezkoder.springjwt.security.service.UserService;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/course")
@@ -51,15 +54,16 @@ public class CourseController {
 
 	@Autowired
 	private CourseService courseService;
-	
+
 	@Autowired
 	private CalendarService calendarService;
-	
-	@Autowired UserService userService;
-	
+
+	@Autowired
+	UserService userService;
+
 	@Autowired
 	private EntityManager em;
-	
+
 	@Autowired
 	private PaginationService paginationService;
 
@@ -76,39 +80,40 @@ public class CourseController {
 //		}
 //		
 //	}
-	@Cacheable(value = "courseCache") 
+	@Cacheable(value = "courseCache")
 	@RequestMapping("/searchCoursesByTitle")
 	public ResponseEntity<?> getCourseByTitle(@RequestParam("title") String title) {
-		System.out.println(title);
 		return findPaginated(1, title, "reg_id", "asc");
 	}
-	
-	
+
 	@GetMapping("/page/{pageNo}")
-	public ResponseEntity<?> findPaginated(@PathVariable (value = "pageNo") int pageNo, 
-			@RequestParam("title") String title,
-			@RequestParam("sortField") String sortField,
+	public ResponseEntity<?> findPaginated(@PathVariable(value = "pageNo") int pageNo,
+			@RequestParam("title") String title, @RequestParam("sortField") String sortField,
 			@RequestParam("sortDir") String sortDir) {
-		System.out.println(sortField);
-//		PaginationResponse paginationResponse = paginationService.getPagination(pageNo, title, sortField, sortDir);
-//		List<CourseDto> courseList = paginationResponse.getDtoCourses();
-		PaginationResponse paginationResponse = paginationService.getPagination(pageNo, title, sortField, sortDir);
-		return ResponseEntity.ok(paginationResponse);
+		try {
+//	PaginationResponse paginationResponse = paginationService.getPagination(pageNo, title, sortField, sortDir);
+//	List<CourseDto> courseList = paginationResponse.getDtoCourses();
+			PaginationResponse paginationResponse = paginationService.getPagination(pageNo, title, sortField, sortDir);
+			return ResponseEntity.ok(paginationResponse);
+		} catch (Exception e) {
+			throw new ResourceNotFoundException("URL does not match");
+		}
 	}
-	
+
 	@PostMapping("/register")
-	public ResponseEntity<?> registerForClasses(@RequestBody String userName, RegisterRequest regIdClasses) throws InterruptedException {
+	public ResponseEntity<?> registerForClasses(@RequestBody String userName, RegisterRequest regIdClasses)
+			throws InterruptedException {
 		JSONObject json = new JSONObject(userName);
 		JSONArray jsonArray = json.getJSONArray("regIdClasses");
-		
+
 		String fetchUserName = json.getString("userName");
-		
-		List<Integer> reg_ids =  courseService.convertJsonArrayCoursesToRegIds(jsonArray);
+
+		List<Integer> reg_ids = courseService.convertJsonArrayCoursesToRegIds(jsonArray);
 		List<Course> courses = courseService.convertJsonToCourses(jsonArray);
-	    User user = userService.findByUsername(fetchUserName);
-		Set<Course> faileRegisterCourses = courseService.getFailedRegisteredClasses(user, courses, reg_ids)  ;
+		User user = userService.findByUsername(fetchUserName);
+		Set<Course> faileRegisterCourses = courseService.getFailedRegisteredClasses(user, courses, reg_ids);
 		if (calendarService.isBeforeDefaultTime()) {
-			if(!courseService.isDuplicated(reg_ids)) {
+			if (!courseService.isDuplicated(reg_ids)) {
 				if (faileRegisterCourses.size() == 0) {
 					userService.registerForClassess(user, courses);
 					List<CourseDto> courseDtos = courseService.coursesToCourseDtos(courses);
@@ -116,8 +121,7 @@ public class CourseController {
 				} else {
 					return ResponseEntity.ok(new MessageResponse("Error !!!"));
 				}
-			}
-			else {
+			} else {
 				return ResponseEntity.ok(new MessageResponse("Courses are duplicated"));
 			}
 		}
@@ -127,42 +131,40 @@ public class CourseController {
 		}
 
 	}
-	
+
 	@GetMapping("/getRegisteredClasses")
 	public ResponseEntity<?> getRegisteredClasses() {
-	    User user = userService.getCurrentLoggedUser();
+		User user = userService.getCurrentLoggedUser();
 		List<Course> registeredCourses = userService.getYourClasses(user);
 		List<CourseDto> courseDtos = courseService.coursesToCourseDtos(registeredCourses);
 		return ResponseEntity.ok(courseDtos);
 	}
+
 	@PostMapping("/dropClasses")
 	public ResponseEntity<?> dropClasses(@RequestBody String userName, RegisterRequest regIdClasses) {
 		JSONObject json = new JSONObject(userName);
 		JSONArray jsonArray = json.getJSONArray("regIdClasses");
-		String fetchUserName = json.getString("userName"); 
-		List<Integer> reg_ids =  courseService.convertJsonArrayCoursesToRegIds(jsonArray);
-	    User user = userService.findByUsername(fetchUserName);
-	    System.out.println(user.getEmail());
-	    System.out.println(reg_ids.size());
+		String fetchUserName = json.getString("userName");
+		List<Integer> reg_ids = courseService.convertJsonArrayCoursesToRegIds(jsonArray);
+		User user = userService.findByUsername(fetchUserName);
+		System.out.println(user.getEmail());
+		System.out.println(reg_ids.size());
 		List<CourseDto> droppedClasses = userService.dropClasses(user, reg_ids);
 		return ResponseEntity.ok(droppedClasses);
 	}
-	
+
 //	@SuppressWarnings("uncheck")
 	// a function created to test for stored procedure
 	// for learning purpose only
 	@GetMapping("/test")
-	public int test (Integer year , String title) {
+	public int test(Integer year, String title) {
 		year = 2021;
 		title = "COMSC";
-		StoredProcedureQuery storedProcedure = 
-		          em
-		            .createStoredProcedureQuery("test")
-		            .registerStoredProcedureParameter(1, Integer.class, ParameterMode.IN)
-		            .registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
-		            .registerStoredProcedureParameter(3, Integer.class, ParameterMode.OUT)
-		            .setParameter(1, year)
-		            .setParameter(2, title);
+		StoredProcedureQuery storedProcedure = em.createStoredProcedureQuery("test")
+				.registerStoredProcedureParameter(1, Integer.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(3, Integer.class, ParameterMode.OUT).setParameter(1, year)
+				.setParameter(2, title);
 		return (int) storedProcedure.getOutputParameterValue(3);
 	}
 }
