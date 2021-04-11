@@ -31,12 +31,11 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 
    
     @Modifying
-	@Query(value =  "UPDATE school.course as c SET c.available = ?1 WHERE c.id = ?2" , nativeQuery = true)
-    
+	@Query(value =  "UPDATE school.course as c SET c.available = ?1 WHERE c.reg_id = ?2" , nativeQuery = true)
     void setAvailable(Integer available, Integer id);
     
     @Modifying
-   	@Query(value =  "UPDATE school.course as c SET c.waitlist = ?1 WHERE c.id = ?2", nativeQuery = true)
+   	@Query(value =  "UPDATE school.course as c SET c.waitlist = ?1 WHERE c.reg_id = ?2", nativeQuery = true)
        void setWailist(Integer waitlist, Integer id); 
     
     @Modifying
