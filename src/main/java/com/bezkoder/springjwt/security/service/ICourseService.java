@@ -1,10 +1,12 @@
 package com.bezkoder.springjwt.security.service;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Set;
 
 import org.json.JSONArray;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -97,6 +99,11 @@ public interface ICourseService {
 	List<Course> findAll();
 
 	List<CourseStudentDto> courseToCourseStudentDtos(Integer regId);
+	
+
+	Page<Course> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection);
+	
+	public Page<Course> findPaginatedByTitle( Integer year, String title, int pageNo, int pageSize, String sortField, String sortDirection);
 
 }
 

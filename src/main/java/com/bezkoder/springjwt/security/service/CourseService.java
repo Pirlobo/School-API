@@ -1,11 +1,13 @@
 package com.bezkoder.springjwt.security.service;
 
 import java.util.ArrayList;
+
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.lucene.queryparser.surround.query.SrndPrefixQuery;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.noneDSA;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,6 +16,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,6 +43,7 @@ import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.RegisterRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.persistence.BookRepository;
+import com.bezkoder.springjwt.persistence.CoursePaginationRepository;
 import com.bezkoder.springjwt.persistence.CourseRepository;
 import com.bezkoder.springjwt.persistence.StudentCourseRepository;
 import com.bezkoder.springjwt.persistence.UserRepository;
@@ -44,7 +54,9 @@ import antlr.debug.NewLineEvent;
 @Service
 @CacheConfig(cacheNames={"course"})   
 public class CourseService implements ICourseService {
-
+	@Autowired
+	private CoursePaginationRepository coursePaginationRepository;
+	
 	@Autowired
 	private CourseRepository courseRepository;
 
@@ -73,6 +85,10 @@ public class CourseService implements ICourseService {
 	public List<CourseDto> searchCourses(String title) {
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 		List<Course> courseList = courseRepository.findByTitle(year, title);
+		List<CourseDto> resultSet = convert(courseList);
+		return resultSet;
+	}
+	public List<CourseDto> convert(List<Course> courseList) {
 		List<CourseDto> resultSet = new ArrayList<>();
 		courseList.forEach(e -> {
 			String from = e.getCalendars().get(0).getStartTime().toString().substring(0, 5);
@@ -92,7 +108,6 @@ public class CourseService implements ICourseService {
 			resultSet.add(courseDto);
 		});
 		return resultSet;
-
 	}
 
 	@Override
@@ -525,6 +540,23 @@ public class CourseService implements ICourseService {
 			courseStudentDtos.add(courseStudentDto);
 		});
 		return courseStudentDtos;
+	}
+
+	@Override
+	public Page<Course> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection) {
+		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() :
+			Sort.by(sortField).descending();
+		
+		Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
+		return courseRepository.findAll(pageable);
+	}
+	@Override
+	public Page<Course> findPaginatedByTitle(Integer year, String title, int pageNo, int pageSize, String sortField, String sortDirection) {
+		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() :
+			Sort.by(sortField).descending();
+		Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
+		Page<Course> coursePage = coursePaginationRepository.findAllByTitle(year, title, pageable);
+		return coursePage;
 	}
 
 }

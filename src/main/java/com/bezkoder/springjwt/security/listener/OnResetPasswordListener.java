@@ -7,6 +7,7 @@ import java.util.UUID;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
@@ -34,6 +35,9 @@ public class OnResetPasswordListener implements ApplicationListener<OnResetPassw
     
     @Autowired
     private UserService userService;
+    
+    @Value("${spring.mail.username}")
+	private String email;
 
     // API
 
@@ -64,8 +68,8 @@ public class OnResetPasswordListener implements ApplicationListener<OnResetPassw
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText("Your Code : " + code);
-        email.setFrom("bonguyens2001@gmail.com");
+        email.setText("You can reset your password by entering these 6-digit numbers: " + code);
+        email.setFrom(this.email);
         return email;
     }
 

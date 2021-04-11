@@ -74,9 +74,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			// JSESSIONID Sẽ ko dc khởi tạo và ko bị sữ dụng để authenthicate subsequent request. Tất cả dửa vào authorization header đã dc tự động bỏ vào khi request
 			// We are using JWT which can be authenticated by itself. Hence, we dont need JSESSIONID 
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/api/auth/**",  "/registrationConfirm*" , "/getCurrentUser").permitAll()
+			.authorizeRequests().antMatchers("/api/auth/**", "/registrationConfirm*" , "/getCurrentUser").permitAll()
 			.antMatchers("/api/test/**", "/login").permitAll()
-			.antMatchers("/api/course/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER")
+			.antMatchers("/api/course/**").hasAnyAuthority("ROLE_USER")
 			.antMatchers("/api/teacher/**").hasAnyAuthority("ROLE_TEACHER")
 			.antMatchers("/api/book/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER")
 			.antMatchers("/api/student/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER")

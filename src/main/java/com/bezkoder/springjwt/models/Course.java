@@ -15,8 +15,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureParameter;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -31,11 +34,20 @@ import antlr.debug.NewLineEvent;
 @Table(name = "course")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@NamedStoredProcedureQuery(name = "test", 
+procedureName = "test", parameters = {
+  @StoredProcedureParameter(mode = ParameterMode.IN, name = "input_year", type = Integer.class),
+  @StoredProcedureParameter(mode = ParameterMode.IN, name = "title", type = String.class),
+  @StoredProcedureParameter(mode = ParameterMode.OUT, name = "count", type = Integer.class)
+  
+}
+
+		)
 public class Course {
 
 	@Id
 	// @GeneratedValue
-	@Column(unique = true, name = "id")
+	@Column(unique = true, name = "regId")
 	private Integer regId;
 
 	private Integer section;
