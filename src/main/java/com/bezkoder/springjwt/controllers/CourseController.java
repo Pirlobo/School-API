@@ -76,6 +76,7 @@ public class CourseController {
 //		}
 //		
 //	}
+	@Cacheable(value = "courseCache") 
 	@RequestMapping("/searchCoursesByTitle")
 	public ResponseEntity<?> getCourseByTitle(@RequestParam("title") String title) {
 		System.out.println(title);
