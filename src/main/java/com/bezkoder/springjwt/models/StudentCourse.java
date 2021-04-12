@@ -140,7 +140,7 @@ public class StudentCourse {
 		this.user = user;
 		this.course = course; 
 		this.userCourseId = new StudentCourseId(user.getId(), course.getRegId());
-		this.isPassed = isPassed.FALSE;
+		this.isPassed = isPassed.IP;
 
 	}
 

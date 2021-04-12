@@ -158,7 +158,7 @@ public class CourseController {
 	// for learning purpose only
 	@GetMapping("/test")
 	public int test(Integer year, String title) {
-		year = 2021;
+		year = 2022;
 		title = "COMSC";
 		StoredProcedureQuery storedProcedure = em.createStoredProcedureQuery("test")
 				.registerStoredProcedureParameter(1, Integer.class, ParameterMode.IN)

@@ -171,19 +171,18 @@ public class SpringBootSecurityJwtApplication {
 		
 		
 		
-		Term term = new Term(1, Semester.Fall, 2021);
+		Term term = new Term(1, Semester.Fall, 2022);
 		Term term2 = new Term(2, Semester.Spring, 2022);
-		Term term3 = new Term(1, Semester.Fall, 2020);
 		termRepository.save(term);
 		termRepository.save(term2);
 		
 		
 		// new courses with fk_teacher
-		Course course1 = new Course(10101, 201, 35, new Date(term.getYear() -1900, 8, 15), new Date(term.getYear() -1900, 11, 20), teacher1, room1, term);
-		Course course2 = new Course(10102, 202, 35,new Date(term.getYear() -1900, 8, 15) ,  new Date(term.getYear() -1900, 11, 20),  teacher1, room1, term);
-		Course course4 = new Course(10103, 301, 35,new Date(term.getYear() -1900, 8, 15) ,  new Date(term.getYear() -1900, 11, 20), teacher1, room1, term);
-		Course course3 = new Course(10104, 302, 1, new Date(term3.getYear() -1900, 12, 15) ,  new Date(term.getYear() -1900, 05, 15), teacher1, room1, term2);
-		Course course5 = new Course(10105, 401, 35, new Date(term3.getYear() -1900, 12, 15) ,  new Date(term.getYear() -1900, 05, 15), teacher1, room1, term2);
+		Course course1 = new Course(10101, 201, 35, new Date(2022 -1900, 8, 15), new Date(2022 -1900, 11, 20), teacher1, room1, term);
+		Course course2 = new Course(10102, 202, 35,new Date(2022 -1900, 8, 15) ,  new Date(2022 -1900, 11, 20),  teacher1, room1, term);
+		Course course4 = new Course(10103, 301, 35,new Date(2022 -1900, 8, 15) ,  new Date(2022 -1900, 11, 20), teacher1, room1, term);
+		Course course3 = new Course(10104, 302, 1, new Date(2021 -1900, 12, 15) ,  new Date(2022 -1900, 05, 15), teacher1, room1, term2);
+		Course course5 = new Course(10105, 401, 35, new Date(2021 -1900, 12, 15) ,  new Date(2022 -1900, 05, 15), teacher1, room1, term2);
 		course1.setSubject(subject);
 		course2.setSubject(subject);
 		course3.setSubject(subject2);
