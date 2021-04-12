@@ -25,6 +25,7 @@ import com.bezkoder.springjwt.payload.request.RegisterRequest;
 @Service
 public interface ICourseService {
 	
+	List<Course> getIPCourses();
 	// 
 	List<CourseDto> coursesToCourseDtos(List<Course> courses);
 	

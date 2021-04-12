@@ -129,23 +129,19 @@ public class CourseController {
 
 	}
 
+	// get Current Registered Classes
 	@GetMapping("/getRegisteredClasses")
 	public ResponseEntity<?> getRegisteredClasses() {
-		User user = userService.getCurrentLoggedUser();
-		List<Course> registeredCourses = userService.getYourClasses(user);
+		List<Course> registeredCourses = courseService.getIPCourses();
 		List<CourseDto> courseDtos = courseService.coursesToCourseDtos(registeredCourses);
 		return ResponseEntity.ok(courseDtos);
 	}
-
 	@PostMapping("/dropClasses")
-	public ResponseEntity<?> dropClasses(@RequestBody String userName, RegisterRequest regIdClasses) {
-		JSONObject json = new JSONObject(userName);
+	public ResponseEntity<?> dropClasses(@RequestBody RegisterRequest regIdClasses) {
+		JSONObject json = new JSONObject(regIdClasses);
 		JSONArray jsonArray = json.getJSONArray("regIdClasses");
-		String fetchUserName = json.getString("userName");
 		List<Integer> reg_ids = courseService.convertJsonArrayCoursesToRegIds(jsonArray);
-		User user = userService.findByUsername(fetchUserName);
-		System.out.println(user.getEmail());
-		System.out.println(reg_ids.size());
+		User user = userService.getCurrentLoggedUser();
 		List<CourseDto> droppedClasses = userService.dropClasses(user, reg_ids);
 		return ResponseEntity.ok(droppedClasses);
 	}

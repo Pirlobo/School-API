@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.lucene.queryparser.surround.query.SrndPrefixQuery;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.noneDSA;
@@ -560,6 +562,23 @@ public class CourseService implements ICourseService {
 		Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
 		Page<Course> coursePage = coursePaginationRepository.findAllByTitle(year, title, pageable);
 		return coursePage;
+	}
+
+	@Override
+	public List<Course> getIPCourses() {
+		User user = userService.getCurrentLoggedUser();
+		List<StudentCourse> unFilteredList = user.getCourses();
+		
+		List<StudentCourse> filteredList=  unFilteredList
+		  .stream()
+		  .filter(c -> c.getIsPassed() == IsPassed.IP)
+		  .collect(Collectors.toList());
+		
+		List<Course> IPCourses = new ArrayList<Course>();
+		for (StudentCourse studentCourse : filteredList) {
+			IPCourses.add(studentCourse.getCourse());
+		}
+		return IPCourses;
 	}
 
 }
