@@ -101,16 +101,13 @@ public class CourseController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<?> registerForClasses(@RequestBody String userName, RegisterRequest regIdClasses)
+	public ResponseEntity<?> registerForClasses(@RequestBody RegisterRequest regIdClasses)
 			throws InterruptedException {
-		JSONObject json = new JSONObject(userName);
+		JSONObject json = new JSONObject(regIdClasses);
 		JSONArray jsonArray = json.getJSONArray("regIdClasses");
-
-		String fetchUserName = json.getString("userName");
-
 		List<Integer> reg_ids = courseService.convertJsonArrayCoursesToRegIds(jsonArray);
 		List<Course> courses = courseService.convertJsonToCourses(jsonArray);
-		User user = userService.findByUsername(fetchUserName);
+		User user = userService.getCurrentLoggedUser();
 		Set<Course> faileRegisterCourses = courseService.getFailedRegisteredClasses(user, courses, reg_ids);
 		if (calendarService.isBeforeDefaultTime()) {
 			if (!courseService.isDuplicated(reg_ids)) {

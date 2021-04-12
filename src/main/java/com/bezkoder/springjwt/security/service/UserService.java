@@ -30,6 +30,7 @@ import com.bezkoder.springjwt.book.RO;
 import com.bezkoder.springjwt.dto.BookItemDto;
 import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.models.Course;
+import com.bezkoder.springjwt.models.IsPassed;
 import com.bezkoder.springjwt.models.PasswordResetToken;
 import com.bezkoder.springjwt.models.StudentCourse;
 import com.bezkoder.springjwt.models.StudentCourseId;
@@ -128,6 +129,7 @@ public class UserService implements IUserService {
 			if (courseService.isAlaivable(courses.get(i))) {
 			System.out.println(user.getEmail());
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
+				userCourse.setIsPassed(IsPassed.IP);
 				userCourse.setWaitlistedRank(courses.get(i).getWaitlist() + 1);
 				userCourse.setUserCourseStatus(StudentCourseStatus.Successfull);
 				courseService.setAvailable(courses.get(i).getAvailable() - 1, courses.get(i).getRegId());
@@ -135,6 +137,7 @@ public class UserService implements IUserService {
 
 			} else {
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
+				userCourse.setIsPassed(IsPassed.IP);
 				userCourse.setUserCourseStatus(StudentCourseStatus.Wailisted);
 				userCourse.setWaitlistedRank(courses.get(i).getCapacity() + courses.get(i).getWaitlist() + 1);
 				courseService.setWailist(courses.get(i).getWaitlist() + 1, courses.get(i).getRegId());

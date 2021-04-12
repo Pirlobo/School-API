@@ -84,7 +84,7 @@ public class CourseService implements ICourseService {
 	@Override
 	public List<CourseDto> searchCourses(String title) {
 		int year = Calendar.getInstance().get(Calendar.YEAR);
-		List<Course> courseList = courseRepository.findByTitle(year, title);
+		List<Course> courseList = courseRepository.findByTitle(year + 1, title);
 		List<CourseDto> resultSet = convert(courseList);
 		return resultSet;
 	}
@@ -155,7 +155,6 @@ public class CourseService implements ICourseService {
 		List<Course> registeredCourses = userService.getYourClasses(user);
 		List<Course> courses2 = findRegisteredClasses(regIdClasses);
 		courses2.forEach(e -> {
-			
 			if (!(isPreregquisited(user, e))) {
 				System.out.println("a");
 				failedRegisteredClasses.add(e);
@@ -245,13 +244,17 @@ public class CourseService implements ICourseService {
 		if (course.getSubject().getPrerequisite() != null) {
 
 			for (int i = 0; i < registeredCourses.size(); i++) {
-				StudentCourse userCourse = new StudentCourse(user, registeredCourses.get(i));
+				StudentCourse userCourse = studentCourseRepository.findStudentCourseById(user.getId(), registeredCourses.get(i).getRegId());
 				if (registeredCourses.get(i).getSubject().getSubjectCode() == course.getSubject().getPrerequisite()
-						.getSubjectCode() && userCourse.getIsPassed() == IsPassed.TRUE) {
-					return true;
+						.getSubjectCode()) {
+					if (userCourse.getIsPassed() == IsPassed.TRUE) {
+						continue;
+					} else {
+						return false;
+					}
 				}
 			}
-			return false;
+			return true;
 		}
 		return true;
 	}
