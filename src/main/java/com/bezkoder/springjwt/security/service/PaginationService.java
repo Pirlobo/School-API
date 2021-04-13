@@ -17,10 +17,10 @@ public class PaginationService {
 	@Autowired
 	private CourseService courseService;
 
-	public PaginationResponse getPagination(int pageNo, String title, String sortField, String sortDir) {
+	public PaginationResponse getPagination(int pageNo, String search, String sortField, String sortDir) {
 		int pageSize = 2;
 		int year = Calendar.getInstance().get(Calendar.YEAR);
-		Page<Course> page = courseService.findPaginatedByTitle(year + 1, title, pageNo, pageSize, sortField, sortDir);
+		Page<Course> page = courseService.findPaginatedByTitle(year + 1, search, pageNo, pageSize, sortField, sortDir);
 //		Page<Course> page = courseService.findPaginated(pageNo, pageSize, sortField, sortDir);
 		List<CourseDto> courseDtos = courseService.convert(page.getContent());
 		PaginationResponse paginationResponse = new PaginationResponse(page.getTotalPages(), page.getTotalElements(), sortDir.equals("asc") ? "desc" : "asc", courseDtos);

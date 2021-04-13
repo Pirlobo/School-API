@@ -556,11 +556,11 @@ public class CourseService implements ICourseService {
 		return courseRepository.findAll(pageable);
 	}
 	@Override
-	public Page<Course> findPaginatedByTitle(Integer year, String title, int pageNo, int pageSize, String sortField, String sortDirection) {
+	public Page<Course> findPaginatedByTitle(Integer year, String search, int pageNo, int pageSize, String sortField, String sortDirection) {
 		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() :
 			Sort.by(sortField).descending();
 		Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
-		Page<Course> coursePage = coursePaginationRepository.findAllByTitle(year, title, pageable);
+		Page<Course> coursePage = coursePaginationRepository.findAllByTitle(year, search, pageable);
 		return coursePage;
 	}
 

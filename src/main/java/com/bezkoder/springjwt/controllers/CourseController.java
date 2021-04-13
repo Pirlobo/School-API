@@ -82,18 +82,18 @@ public class CourseController {
 //	}
 	@Cacheable(value = "courseCache")
 	@RequestMapping("/searchCoursesByTitle")
-	public ResponseEntity<?> getCourseByTitle(@RequestParam("title") String title) {
-		return findPaginated(1, title, "reg_id", "asc");
+	public ResponseEntity<?> getCourseByTitle(@RequestParam("search") String search) {
+		return findPaginated(1, search, "reg_id", "asc");
 	}
 
 	@GetMapping("/page/{pageNo}")
 	public ResponseEntity<?> findPaginated(@PathVariable(value = "pageNo") int pageNo,
-			@RequestParam("title") String title, @RequestParam("sortField") String sortField,
+			@RequestParam("search") String search, @RequestParam("sortField") String sortField,
 			@RequestParam("sortDir") String sortDir) {
 		try {
 //	PaginationResponse paginationResponse = paginationService.getPagination(pageNo, title, sortField, sortDir);
 //	List<CourseDto> courseList = paginationResponse.getDtoCourses();
-			PaginationResponse paginationResponse = paginationService.getPagination(pageNo, title, sortField, sortDir);
+			PaginationResponse paginationResponse = paginationService.getPagination(pageNo, search, sortField, sortDir);
 			return ResponseEntity.ok(paginationResponse);
 		} catch (Exception e) {
 			throw new ResourceNotFoundException("URL does not match");

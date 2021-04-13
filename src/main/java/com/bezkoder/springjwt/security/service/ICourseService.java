@@ -104,7 +104,7 @@ public interface ICourseService {
 
 	Page<Course> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection);
 	
-	public Page<Course> findPaginatedByTitle( Integer year, String title, int pageNo, int pageSize, String sortField, String sortDirection);
+	public Page<Course> findPaginatedByTitle( Integer year, String title,  int pageNo, int pageSize, String sortField, String sortDirection);
 
 }
 
