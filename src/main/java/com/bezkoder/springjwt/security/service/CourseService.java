@@ -1,38 +1,18 @@
 package com.bezkoder.springjwt.security.service;
 
 import java.util.ArrayList;
-
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import org.apache.lucene.queryparser.surround.query.SrndPrefixQuery;
-import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.noneDSA;
 import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.web.SortDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.thymeleaf.model.IStandaloneElementTag;
-
 import com.bezkoder.springjwt.book.Books;
 import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.dto.CourseStudentDto;
@@ -40,37 +20,28 @@ import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.IsPassed;
 import com.bezkoder.springjwt.models.StudentCourse;
 import com.bezkoder.springjwt.models.StudentCourseId;
-import com.bezkoder.springjwt.models.StudentCourseStatus;
 import com.bezkoder.springjwt.models.User;
-import com.bezkoder.springjwt.payload.request.RegisterRequest;
-import com.bezkoder.springjwt.payload.response.MessageResponse;
-import com.bezkoder.springjwt.persistence.BookRepository;
 import com.bezkoder.springjwt.persistence.CoursePaginationRepository;
 import com.bezkoder.springjwt.persistence.CourseRepository;
 import com.bezkoder.springjwt.persistence.StudentCourseRepository;
-import com.bezkoder.springjwt.persistence.UserRepository;
-import com.google.common.collect.Lists;
-
-import antlr.debug.NewLineEvent;
 
 @Service
-@CacheConfig(cacheNames={"course"})   
 public class CourseService implements ICourseService {
 	@Autowired
 	private CoursePaginationRepository coursePaginationRepository;
-	
+
 	@Autowired
 	private CourseRepository courseRepository;
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	CourseService courseService;
-	
+
 	@Autowired
 	private StudentCourseRepository studentCourseRepository;
-	
+
 	@Autowired
 	private UserCourseService userCourseService;
 
@@ -87,6 +58,7 @@ public class CourseService implements ICourseService {
 		List<CourseDto> resultSet = convert(courseList);
 		return resultSet;
 	}
+
 	public List<CourseDto> convert(List<Course> courseList) {
 		List<CourseDto> resultSet = new ArrayList<>();
 		courseList.forEach(e -> {
@@ -98,8 +70,7 @@ public class CourseService implements ICourseService {
 			} catch (Exception e2) {
 				prerequisite = "None";
 			}
-			
-			
+
 			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
 					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
 					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
@@ -184,7 +155,7 @@ public class CourseService implements ICourseService {
 				failedRegisteredClasses.add(course1);
 			}
 
-		for (int j = 0; j < registeredCourses.size(); j++) {
+			for (int j = 0; j < registeredCourses.size(); j++) {
 				if (regIdClasses.get(i) == registeredCourses.get(j).getRegId()) {
 					System.out.println("e");
 					Course course = courseRepository.findById(regIdClasses.get(i)).orElse(null);
@@ -242,7 +213,8 @@ public class CourseService implements ICourseService {
 		if (course.getSubject().getPrerequisite() != null) {
 
 			for (int i = 0; i < registeredCourses.size(); i++) {
-				StudentCourse userCourse = studentCourseRepository.findStudentCourseById(user.getId(), registeredCourses.get(i).getRegId());
+				StudentCourse userCourse = studentCourseRepository.findStudentCourseById(user.getId(),
+						registeredCourses.get(i).getRegId());
 				if (registeredCourses.get(i).getSubject().getSubjectCode() == course.getSubject().getPrerequisite()
 						.getSubjectCode()) {
 					if (userCourse.getIsPassed() == IsPassed.TRUE) {
@@ -273,8 +245,9 @@ public class CourseService implements ICourseService {
 	public boolean isRepeated(User user, Course course) {
 		List<Course> currentCourses = userService.getYourClasses(user);
 		for (int i = 0; i < currentCourses.size(); i++) {
-			if (currentCourses.get(i).getSubject().getSubjectCode().toString().equals(course.getSubject().getSubjectCode().toString())) {
-				
+			if (currentCourses.get(i).getSubject().getSubjectCode().toString()
+					.equals(course.getSubject().getSubjectCode().toString())) {
+
 				if (!(isPassed(user, currentCourses.get(i)))) {
 					if (currentCourses.get(i).getTerm().getSemester().toString()
 							.equals(course.getTerm().getSemester().toString())) {
@@ -286,11 +259,10 @@ public class CourseService implements ICourseService {
 					} else {
 						return true;
 					}
-					
+
 				}
 				return false;
 			}
-			
 
 		}
 		return true;
@@ -394,21 +366,17 @@ public class CourseService implements ICourseService {
 			if (courseService.isNotTimeConflicted(user, registeredClasses.get(i), regIdClasses)) {
 				unConflictedCourses.add(registeredClasses.get(i));
 			} else {
-
 				a++;
-
 			}
 		}
 		if (a == 0) {
 			return false;
 		} else {
-			// redirectAttributes.addFlashAttribute("error", "C");
 			return true;
 		}
 	}
 
 	public List<Course> getUnconflictedCourse(User user, List<Integer> regIdClasses) {
-		int a = 0;
 		List<Course> unConflictedCourses = new ArrayList<Course>();
 		List<Course> registeredClasses = courseService.findRegisteredClasses(regIdClasses);
 		for (int i = 0; i < registeredClasses.size(); i++) {
@@ -516,14 +484,14 @@ public class CourseService implements ICourseService {
 			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
 					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
 					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
-					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), term_year, registerStatus, registerRank);
+					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), term_year, registerStatus,
+					registerRank);
 			courseDtos.add(courseDto);
-			
+
 		});
 		return courseDtos;
 
 	}
-
 
 	@Override
 	public List<Course> findAll() {
@@ -537,7 +505,10 @@ public class CourseService implements ICourseService {
 		List<StudentCourse> studentCourseList = course.getUsers();
 		List<CourseStudentDto> courseStudentDtos = new ArrayList<CourseStudentDto>();
 		studentCourseList.forEach(e -> {
-			CourseStudentDto courseStudentDto = new CourseStudentDto(e.getUser().getUsername(), e.getUser().getEmail(), e.getUserCourseStatus().toString(), e.getCourse().getSubject().getSubjectCode().toString(), e.getCourse().getSubject().getDescription(), e.getWaitlistedRank(), e.getCourse().getCapacity(), e.getCourse().getAvailable());
+			CourseStudentDto courseStudentDto = new CourseStudentDto(e.getUser().getUsername(), e.getUser().getEmail(),
+					e.getUserCourseStatus().toString(), e.getCourse().getSubject().getSubjectCode().toString(),
+					e.getCourse().getSubject().getDescription(), e.getWaitlistedRank(), e.getCourse().getCapacity(),
+					e.getCourse().getAvailable());
 			courseStudentDtos.add(courseStudentDto);
 		});
 		return courseStudentDtos;
@@ -545,16 +516,18 @@ public class CourseService implements ICourseService {
 
 	@Override
 	public Page<Course> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection) {
-		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() :
-			Sort.by(sortField).descending();
-		
+		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending()
+				: Sort.by(sortField).descending();
+
 		Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
 		return courseRepository.findAll(pageable);
 	}
+
 	@Override
-	public Page<Course> findPaginatedByTitle(Integer year, String search, int pageNo, int pageSize, String sortField, String sortDirection) {
-		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() :
-			Sort.by(sortField).descending();
+	public Page<Course> findPaginatedByTitle(Integer year, String search, int pageNo, int pageSize, String sortField,
+			String sortDirection) {
+		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending()
+				: Sort.by(sortField).descending();
 		Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
 		Page<Course> coursePage = coursePaginationRepository.findAllByTitle(year, search, pageable);
 		return coursePage;
@@ -564,12 +537,10 @@ public class CourseService implements ICourseService {
 	public List<Course> getIPCourses() {
 		User user = userService.getCurrentLoggedUser();
 		List<StudentCourse> unFilteredList = user.getCourses();
-		
-		List<StudentCourse> filteredList=  unFilteredList
-		  .stream()
-		  .filter(c -> c.getIsPassed() == IsPassed.IP)
-		  .collect(Collectors.toList());
-		
+
+		List<StudentCourse> filteredList = unFilteredList.stream().filter(c -> c.getIsPassed() == IsPassed.IP)
+				.collect(Collectors.toList());
+
 		List<Course> IPCourses = new ArrayList<Course>();
 		for (StudentCourse studentCourse : filteredList) {
 			IPCourses.add(studentCourse.getCourse());

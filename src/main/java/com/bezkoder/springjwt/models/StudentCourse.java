@@ -1,24 +1,15 @@
 package com.bezkoder.springjwt.models;
 
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
-
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
-
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-
 
 @Entity
 @Cacheable
@@ -39,7 +30,7 @@ public class StudentCourse {
 	private GPA gpa;
 
 	private Integer percentage;
-	
+
 	private Integer waitlistedRank;
 
 	public Integer getWaitlistedRank() {
@@ -50,11 +41,9 @@ public class StudentCourse {
 		this.waitlistedRank = waitlistedRank;
 	}
 
-
-
 	@Enumerated(EnumType.STRING)
 	private IsPassed isPassed;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@MapsId("regId")
 	private Course course;
@@ -66,9 +55,6 @@ public class StudentCourse {
 	public void setPercentage(Integer percentage) {
 		this.percentage = percentage;
 	}
-
-	
-	
 
 	public IsPassed getIsPassed() {
 		return isPassed;
@@ -97,8 +83,6 @@ public class StudentCourse {
 	public StudentCourse() {
 		super();
 	}
-
-	
 
 	@Enumerated(EnumType.STRING)
 	private StudentCourseStatus userCourseStatus;
@@ -138,7 +122,7 @@ public class StudentCourse {
 	public StudentCourse(User user, Course course) {
 		super();
 		this.user = user;
-		this.course = course; 
+		this.course = course;
 		this.userCourseId = new StudentCourseId(user.getId(), course.getRegId());
 	}
 

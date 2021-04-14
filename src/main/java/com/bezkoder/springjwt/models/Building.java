@@ -1,15 +1,12 @@
 package com.bezkoder.springjwt.models;
 
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
@@ -20,10 +17,10 @@ public class Building {
 
 	@Id
 	private Integer id;
-	
+
 	private String buildingName;
-	
-	@OneToMany(mappedBy = "building" )
+
+	@OneToMany(mappedBy = "building")
 	private List<Room> rooms = new ArrayList<Room>();
 
 	public Integer getId() {
@@ -54,12 +51,11 @@ public class Building {
 		super();
 		this.id = id;
 		this.buildingName = buildingName;
-		
+
 	}
 
 	public Building() {
 		super();
 	}
-	
-	
+
 }

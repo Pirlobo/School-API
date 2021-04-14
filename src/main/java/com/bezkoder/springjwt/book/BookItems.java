@@ -1,50 +1,38 @@
 package com.bezkoder.springjwt.book;
 
-
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 @Entity
 @Table(name = "bookItem")
-public class BookItems{
-	
+public class BookItems {
+
 	@Id
 	private Integer barcode;
-	
+
 	private Double rentalPrice;
 
 	private Double sellingPrice;
-	
+
 	private boolean isForRent;
-	
+
 	@Enumerated(EnumType.STRING)
 	private Format format;
-	
-	@OneToMany (mappedBy = "bookItems")
+
+	@OneToMany(mappedBy = "bookItems")
 	@JsonIgnore
 	private List<RO> rIitems = new ArrayList<RO>();
-	
-	@OneToMany (mappedBy = "bookItems")
+
+	@OneToMany(mappedBy = "bookItems")
 	@JsonIgnore
 	private List<PO> pIitems = new ArrayList<PO>();
-	
-	
-
 
 	public Integer getBarcode() {
 		return barcode;
@@ -53,8 +41,6 @@ public class BookItems{
 	public void setBarcode(Integer barcode) {
 		this.barcode = barcode;
 	}
-
-	
 
 	public Double getRentalPrice() {
 		return rentalPrice;
@@ -72,9 +58,6 @@ public class BookItems{
 		this.sellingPrice = sellingPrice;
 	}
 
-	
-
-
 	public Format getFormat() {
 		return format;
 	}
@@ -86,8 +69,6 @@ public class BookItems{
 	public BookItems() {
 		super();
 	}
-
-	
 
 	public List<RO> getrIitems() {
 		return rIitems;
@@ -120,19 +101,17 @@ public class BookItems{
 		this.sellingPrice = sellingPrice;
 		this.isForRent = isForRent;
 		this.format = format;
-		
+
 	}
 
 	public void addRO(RO ro) {
 		rIitems.add(ro);
 		ro.setBookItems(this);
 	}
-	
+
 	public void addPO(PO po) {
 		pIitems.add(po);
 		po.setBookItems(this);
 	}
-	
 
-	
 }

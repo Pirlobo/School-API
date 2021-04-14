@@ -2,28 +2,16 @@ package com.bezkoder.springjwt.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-
 import com.bezkoder.springjwt.book.Authors;
 import com.bezkoder.springjwt.book.BookItems;
-import com.bezkoder.springjwt.book.Books;
-import com.bezkoder.springjwt.models.Course;
-import com.bezkoder.springjwt.models.SubjectCode;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 public class BookDto {
-	
+
 	private Integer id;
 
 	private String subjectCode;
-	
+
 	@NotNull
 	private String ISBN;
 
@@ -82,6 +70,7 @@ public class BookDto {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
 	public String getPublisher() {
 		return publisher;
 	}
@@ -102,9 +91,8 @@ public class BookDto {
 		return numOfPages;
 	}
 
-	public BookDto(Integer id, String isbn, String title, String publisher, String language, Integer numOfPages
-			, List<BookItems> bookItems, List<Authors> authorList, String subjectCode
-			) {
+	public BookDto(Integer id, String isbn, String title, String publisher, String language, Integer numOfPages,
+			List<BookItems> bookItems, List<Authors> authorList, String subjectCode) {
 		super();
 		this.id = id;
 		this.ISBN = isbn;
@@ -116,7 +104,6 @@ public class BookDto {
 		this.authorList = authorList;
 		this.subjectCode = subjectCode;
 	}
-
 
 	public String getSubjectCode() {
 		return subjectCode;

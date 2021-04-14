@@ -1,36 +1,26 @@
 package com.bezkoder.springjwt.models;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 //@Table(name = "teacher")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Teacher {
-	
+
 	@Id
-	//@GeneratedValue
+	// @GeneratedValue
 	private Integer id;
-	
+
 	private String name;
-	
+
 	@OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
 	private List<Course> courses = new ArrayList<Course>();
 
@@ -38,7 +28,7 @@ public class Teacher {
 		super();
 		this.id = id;
 		this.name = name;
-		
+
 	}
 
 	public Teacher(Integer id, String name, List<Course> courses) {
@@ -75,8 +65,5 @@ public class Teacher {
 	public void setCourses(List<Course> courses) {
 		this.courses = courses;
 	}
-	
-	
 
 }
-

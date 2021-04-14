@@ -1,43 +1,33 @@
 package com.bezkoder.springjwt.security.event;
 
-
-
-
 import org.springframework.context.ApplicationEvent;
-
-import org.springframework.stereotype.Component;
-
 import com.bezkoder.springjwt.models.User;
-import com.sun.istack.FinalArrayList;
-
 
 public class OnAnnouncementEvent extends ApplicationEvent {
 
-    private final String content;
-    
-    private final User user;
-    
-    private final String[] receiptAdresses;
+	private final String content;
 
-    public OnAnnouncementEvent(final User user, final String[] receiptAdresses, final String content) {
-        super(user);
-        this.user = user;
-        this.content = content;
-        this.receiptAdresses = receiptAdresses;
-    }
+	private final User user;
 
-    //
+	private final String[] receiptAdresses;
 
-    public String getContent() {
-        return content;
-    }
+	public OnAnnouncementEvent(final User user, final String[] receiptAdresses, final String content) {
+		super(user);
+		this.user = user;
+		this.content = content;
+		this.receiptAdresses = receiptAdresses;
+	}
 
-    public String[] getReceiptAdresses() {
+	public String getContent() {
+		return content;
+	}
+
+	public String[] getReceiptAdresses() {
 		return receiptAdresses;
 	}
 
 	public User getUser() {
-        return user;
-    }
+		return user;
+	}
 
 }

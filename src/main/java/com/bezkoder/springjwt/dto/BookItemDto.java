@@ -1,13 +1,13 @@
 package com.bezkoder.springjwt.dto;
 
 public class BookItemDto {
-	
+
 	private Integer barcode;
-	
+
 	private boolean isRented;
-	
+
 	private boolean isSold;
-	
+
 	private Integer sellQuantity;
 
 	public Integer getBarcode() {
@@ -18,8 +18,6 @@ public class BookItemDto {
 		this.barcode = barcode;
 	}
 
-	
-
 	public Integer getSellQuantity() {
 		return sellQuantity;
 	}
@@ -27,8 +25,6 @@ public class BookItemDto {
 	public void setSellQuantity(Integer sellQuantity) {
 		this.sellQuantity = sellQuantity;
 	}
-
-	
 
 	public boolean isRented() {
 		return isRented;
@@ -57,9 +53,5 @@ public class BookItemDto {
 		this.isSold = isSold;
 		this.sellQuantity = sellQuantity;
 	}
-	
-	
-	
 
 }
-

@@ -3,9 +3,9 @@ package com.bezkoder.springjwt.models;
 public class StudentDto {
 
 	private String email;
-	
+
 	private String username;
-	
+
 	private String code;
 
 	public String getEmail() {
@@ -24,7 +24,7 @@ public class StudentDto {
 		this.username = username;
 	}
 
-	public StudentDto(String code,String email, String username) {
+	public StudentDto(String code, String email, String username) {
 		super();
 		this.code = code;
 		this.email = email;
@@ -38,9 +38,5 @@ public class StudentDto {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
-	
-	
-	
-	
+
 }

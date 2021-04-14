@@ -1,7 +1,7 @@
 package com.bezkoder.springjwt.payload.response;
 
 public class ResetPasswordResponse {
-	
+
 	private String resetPasswordToken;
 
 	public String getResetPasswordToken() {
@@ -16,7 +16,5 @@ public class ResetPasswordResponse {
 		super();
 		this.resetPasswordToken = resetPasswordToken;
 	}
-	
-	
-	
+
 }

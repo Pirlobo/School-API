@@ -1,42 +1,29 @@
 package com.bezkoder.springjwt.book;
+
 import java.util.ArrayList;
-
-
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.bezkoder.springjwt.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
-
 @Entity
 public class Orders {
-	
 
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer orderId;
-	
+
 	private Double totalPrice;
-	
-	
-	
-	 public Double getTotalPrice() {
+
+	public Double getTotalPrice() {
 		return totalPrice;
 	}
 
@@ -52,29 +39,18 @@ public class Orders {
 		this.user = user;
 	}
 
-	@OneToMany(
-		        mappedBy = "orders",
-		        cascade = CascadeType.ALL,
-		        orphanRemoval = true
-		    )
+	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
 
 	private List<RO> RItems = new ArrayList<RO>();
-	 
-	 
-	 @OneToMany(
-		        mappedBy = "orders",
-		        cascade = CascadeType.ALL,
-		        orphanRemoval = true
-		    )
-	 
+
+	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
+
 	private List<PO> PItems = new ArrayList<PO>();
 
-
-	 @ManyToOne
+	@ManyToOne
 	@JsonIgnore
-	 private User user;
+	private User user;
 
-	
 	public List<RO> getRItems() {
 		return RItems;
 	}
@@ -103,10 +79,9 @@ public class Orders {
 		this.orderId = orderId;
 	}
 
-	public Orders( User user, Double totalPrice) {
+	public Orders(User user, Double totalPrice) {
 		super();
-		
-		
+
 		this.user = user;
 		this.totalPrice = totalPrice;
 	}
@@ -115,10 +90,10 @@ public class Orders {
 		RItems.add(ro);
 		ro.setOrders(this);
 	}
-	
+
 	public void addPO(PO po) {
 		PItems.add(po);
 		po.setOrders(this);
 	}
-	 
+
 }

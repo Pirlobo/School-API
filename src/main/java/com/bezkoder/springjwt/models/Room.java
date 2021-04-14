@@ -2,14 +2,12 @@ package com.bezkoder.springjwt.models;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
@@ -20,28 +18,18 @@ public class Room {
 
 	@Id
 	private Integer id;
-	
-	
+
 	public Room() {
 		super();
 	}
 
 	private String roomName;
-	
+
 	@ManyToOne
 	private Building building;
 
-	
-	
 	@OneToMany(mappedBy = "course")
 	private List<Classroom> calendars = new ArrayList<Classroom>();
-	
-	
-	
-	
-	
-
-	
 
 	public List<Classroom> getCalendars() {
 		return calendars;
@@ -50,8 +38,6 @@ public class Room {
 	public void setCalendars(List<Classroom> calendars) {
 		this.calendars = calendars;
 	}
-
-
 
 	public Integer getId() {
 		return id;
@@ -82,12 +68,7 @@ public class Room {
 		this.id = id;
 		this.roomName = roomName;
 		this.building = building;
-		
+
 	}
 
-	
-	
-	
-	
 }
-

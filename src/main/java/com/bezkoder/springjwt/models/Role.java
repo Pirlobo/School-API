@@ -1,10 +1,6 @@
 package com.bezkoder.springjwt.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.*;
-
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
@@ -19,10 +15,6 @@ public class Role {
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
 	private ERole name;
-	
-	
-	
-	
 
 	public Role() {
 
@@ -31,8 +23,6 @@ public class Role {
 	public Role(ERole name) {
 		this.name = name;
 	}
-	
-	
 
 	public Integer getId() {
 		return id;
@@ -45,8 +35,6 @@ public class Role {
 	public ERole getName() {
 		return name;
 	}
-
-
 
 	public void setName(ERole name) {
 		this.name = name;

@@ -3,22 +3,20 @@ package com.bezkoder.springjwt.dto;
 public class CourseStudentDto {
 
 	private String userName;
-	
+
 	private String email;
-	
+
 	private String registerStatus;
-	
+
 	private String courseTitle;
-	
+
 	private String description;
-	
+
 	private Integer wailistedRank;
-	
+
 	private Integer capacity;
-	
+
 	private Integer available;
-	
-	
 
 	public Integer getAvailable() {
 		return available;
@@ -97,6 +95,4 @@ public class CourseStudentDto {
 		this.available = available;
 	}
 
-
-	
 }

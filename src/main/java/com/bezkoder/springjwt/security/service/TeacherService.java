@@ -2,11 +2,8 @@ package com.bezkoder.springjwt.security.service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.StudentCourse;
 import com.bezkoder.springjwt.models.StudentCourseId;

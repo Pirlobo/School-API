@@ -5,7 +5,7 @@ import com.sun.istack.NotNull;
 public class AnnouncementRequest {
 	@NotNull
 	private String userName;
-	
+
 	private String content;
 
 	public String getUserName() {
@@ -23,6 +23,5 @@ public class AnnouncementRequest {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	
-	
+
 }

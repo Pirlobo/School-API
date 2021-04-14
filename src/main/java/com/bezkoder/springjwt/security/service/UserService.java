@@ -1,28 +1,16 @@
 package com.bezkoder.springjwt.security.service;
 
-import java.sql.Date;
-
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
-
 import javax.transaction.Transactional;
-
-import org.apache.naming.java.javaURLContextFactory;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import com.bezkoder.springjwt.book.BookItems;
 import com.bezkoder.springjwt.book.Orders;
 import com.bezkoder.springjwt.book.PO;
@@ -40,7 +28,6 @@ import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.models.VerificationToken;
 import com.bezkoder.springjwt.payload.request.EditProfileRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
-import com.bezkoder.springjwt.persistence.CourseRepository;
 import com.bezkoder.springjwt.persistence.PasswordResetTokenRepository;
 import com.bezkoder.springjwt.persistence.StudentCourseRepository;
 import com.bezkoder.springjwt.persistence.UserCourseRepository;
@@ -50,7 +37,6 @@ import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 
 @Service
 @Transactional
-@CacheConfig(cacheNames={"user"})
 public class UserService implements IUserService {
 
 	@Autowired
@@ -82,10 +68,12 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private OrderService orderService;
-	
+
 	@Autowired
 	private StudentCourseRepository studentCourseRepository;
-	
+
+	@Value("${spring.mail.username}")
+	private String email;
 
 	@Override
 	public void createVerificationTokenForUser(final User user, final String token) {
@@ -119,8 +107,6 @@ public class UserService implements IUserService {
 		// from 0 to 999999
 		Random rnd = new Random();
 		int number = rnd.nextInt(999999);
-
-		// this will convert any number sequence into 6 character.
 		return String.format("%06d", number);
 	}
 
@@ -128,7 +114,7 @@ public class UserService implements IUserService {
 	public void registerForClassess(User user, List<Course> courses) {
 		for (int i = 0; i < courses.size(); i++) {
 			if (courseService.isAlaivable(courses.get(i))) {
-			System.out.println(user.getEmail());
+				System.out.println(user.getEmail());
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
 				userCourse.setIsPassed(IsPassed.IP);
 				userCourse.setWaitlistedRank(courses.get(i).getWaitlist() + 1);
@@ -169,9 +155,6 @@ public class UserService implements IUserService {
 		try {
 			List<StudentCourse> userCourses = user.getCourses();
 			userCourses.forEach(e -> {
-//				if (e.getUserCourseStatus().equals(StudentCourseStatus.Successfull)) {
-//					yourClasses.add(e.getCourse());
-//				}
 				yourClasses.add(e.getCourse());
 			});
 		} catch (Exception e) {
@@ -180,7 +163,6 @@ public class UserService implements IUserService {
 		return yourClasses;
 
 	}
-
 
 	@Override
 	public List<CourseDto> dropClasses(User user, List<Integer> regIdClasses) {
@@ -201,7 +183,7 @@ public class UserService implements IUserService {
 				throw new ResourceNotFoundException("Could not find");
 			}
 		});
-		
+
 		userCourses.forEach(e -> {
 			if (e.getCourse().getWaitlist() <= 0) {
 				List<StudentCourse> afterRankList = studentCourseRepository.findAfterRank(e.getWaitlistedRank());
@@ -209,7 +191,7 @@ public class UserService implements IUserService {
 					studentCourse.setWaitlistedRank(studentCourse.getWaitlistedRank() - 1);
 				});
 				studentCourseRepository.saveAll(afterRankList);
-				
+
 				courseService.setAvailable(e.getCourse().getAvailable() + 1, e.getCourse().getRegId());
 				courseService.save(e.getCourse());
 				userCourseService.delete(e);
@@ -225,7 +207,7 @@ public class UserService implements IUserService {
 				courseService.setWailist(e.getCourse().getWaitlist() - 1, e.getCourse().getRegId());
 				courseService.save(e.getCourse());
 				userCourseService.delete(e);
-				
+
 			}
 
 		});
@@ -233,7 +215,6 @@ public class UserService implements IUserService {
 		return resultSet;
 
 	}
-
 
 	@Override
 	public Orders placeOrder(List<BookItemDto> bookItemDto) {
@@ -314,7 +295,7 @@ public class UserService implements IUserService {
 	@Override
 	public List<User> findAllUsers() {
 		List<User> users = userRepository.findAll();
-		User teacher = userRepository.findByEmail("bonguyens2001@gmail.com").orElse(null);
+		User teacher = userRepository.findByEmail(this.email).orElse(null);
 		users.remove(teacher);
 		return users;
 	}
@@ -324,16 +305,15 @@ public class UserService implements IUserService {
 		User user = userService.getCurrentLoggedUser();
 		JSONObject json = new JSONObject(editProfileRequest);
 		String email = (String) json.get("email");
-		System.out.println(email);
 		User user2 = userService.findByEmail(email);
- 		if (user2 != null) {
- 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+		if (user2 != null) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
 		} else {
-			user.setEmail(email); 
+			user.setEmail(email);
 			userService.save(user);
 			return ResponseEntity.ok(new MessageResponse("Saved"));
 		}
-		
+
 	}
 
 }

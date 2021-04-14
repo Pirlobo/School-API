@@ -13,7 +13,7 @@ import com.bezkoder.springjwt.payload.response.PaginationResponse;
 
 @Service
 public class PaginationService {
-	
+
 	@Autowired
 	private CourseService courseService;
 
@@ -23,7 +23,8 @@ public class PaginationService {
 		Page<Course> page = courseService.findPaginatedByTitle(year + 1, search, pageNo, pageSize, sortField, sortDir);
 //		Page<Course> page = courseService.findPaginated(pageNo, pageSize, sortField, sortDir);
 		List<CourseDto> courseDtos = courseService.convert(page.getContent());
-		PaginationResponse paginationResponse = new PaginationResponse(page.getTotalPages(), page.getTotalElements(), sortDir.equals("asc") ? "desc" : "asc", courseDtos);
+		PaginationResponse paginationResponse = new PaginationResponse(page.getTotalPages(), page.getTotalElements(),
+				sortDir.equals("asc") ? "desc" : "asc", courseDtos);
 		return paginationResponse;
 	}
 }

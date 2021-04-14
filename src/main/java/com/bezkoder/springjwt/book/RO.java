@@ -1,26 +1,17 @@
 package com.bezkoder.springjwt.book;
 
 import java.sql.Date;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-
 
 @Entity
 @Table(name = "reservationOrder")
 public class RO {
 
-	// By placing @Id on field which implicitly set the AccessType (AccessType.Field) (Best Practice)
-	//meaning that getter setter does not considered as parts of persistent state, (Using Reflection API instead)
-	// omit getter or setter methods that should not be called, and easy to add more business code
-	// no need to mark @transient (not a part of persistent state)
-	
 	@Id
 	@GeneratedValue
 	private Integer id;
@@ -36,7 +27,6 @@ public class RO {
 
 	private Date borrowDate;
 
-	
 	private Date returnDate;
 
 	public BookItems getBookItems() {

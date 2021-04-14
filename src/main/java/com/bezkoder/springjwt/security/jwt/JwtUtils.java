@@ -1,14 +1,11 @@
 package com.bezkoder.springjwt.security.jwt;
 
 import java.util.Date;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
 
@@ -26,16 +23,13 @@ public class JwtUtils {
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
-		return Jwts.builder()
-				.setSubject((userPrincipal.getUsername()))
-				.setIssuedAt(new Date())
+		return Jwts.builder().setSubject((userPrincipal.getUsername())).setIssuedAt(new Date())
 //				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-				// 60000 = 1 minute
-				// => 900000 = 15 minutes 
+		// 60000 = 1 minute
+		// => 900000 = 15 minutes
 //				.setExpiration(new Date(( System.currentTimeMillis() + 10000000 )))
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-				.signWith(SignatureAlgorithm.HS512, jwtSecret)
-				.compact();
+				.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
 	}
 
 	public String getUserNameFromJwtToken(String token) {

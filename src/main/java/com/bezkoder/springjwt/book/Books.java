@@ -1,41 +1,27 @@
 package com.bezkoder.springjwt.book;
 
 import java.util.ArrayList;
-
-
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.CascadeType;
-
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.bezkoder.springjwt.models.Course;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
-import org.hibernate.annotations.Cache;
 
 @Entity
 @Table(name = "book")
 public class Books {
 
 	@Id
-	//@GeneratedValue
+	// @GeneratedValue
 	private Integer id;
 
 	@NotNull
@@ -51,19 +37,18 @@ public class Books {
 
 	@NotNull
 	private Integer numOfPages;
-	
 
 	@ManyToMany(mappedBy = "books", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //	@JoinTable(name = "course_books",
 //	joinColumns = { @JoinColumn(name = "fk_book") },
 //	inverseJoinColumns = { @JoinColumn(name = "fk_course") })
-	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	@JsonIgnore 
+	@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+	@JsonIgnore
 	private List<Course> courses = new ArrayList<Course>();
 
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<BookItems> bookItems = new ArrayList<BookItems>();
-	
+
 	public List<Course> getCourses() {
 		return courses;
 	}
@@ -73,9 +58,8 @@ public class Books {
 	}
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name = "books_authors",
-	joinColumns = { @JoinColumn(name = "fk_book") },
-	inverseJoinColumns = { @JoinColumn(name = "fk_author") })
+	@JoinTable(name = "books_authors", joinColumns = { @JoinColumn(name = "fk_book") }, inverseJoinColumns = {
+			@JoinColumn(name = "fk_author") })
 	@JsonIgnore
 	private List<Authors> authorList = new ArrayList<Authors>();
 
@@ -122,10 +106,6 @@ public class Books {
 	public Books() {
 		super();
 	}
-	
-	
-	
-	
 
 	public Integer getId() {
 		return id;
@@ -135,8 +115,7 @@ public class Books {
 		this.id = id;
 	}
 
-	public Books(Integer id, String iSBN, String title, String publisher, String language,
-			Integer numOfPages) {
+	public Books(Integer id, String iSBN, String title, String publisher, String language, Integer numOfPages) {
 		super();
 		this.id = id;
 		ISBN = iSBN;
@@ -144,19 +123,21 @@ public class Books {
 		this.publisher = publisher;
 		this.language = language;
 		this.numOfPages = numOfPages;
-		
+
 	}
-	 public void addAuthor(Authors author) {
-	        authorList.add(author);
-	       author.getBookList().add(this);
-	    }
-	public Books(Integer id, String iSBN, String title, String publisher, String language,
-			Integer numOfPages, List<Authors> authorList) {
+
+	public void addAuthor(Authors author) {
+		authorList.add(author);
+		author.getBookList().add(this);
+	}
+
+	public Books(Integer id, String iSBN, String title, String publisher, String language, Integer numOfPages,
+			List<Authors> authorList) {
 		super();
 		this.id = id;
 		ISBN = iSBN;
 		this.title = title;
-		
+
 		this.publisher = publisher;
 		this.language = language;
 		this.numOfPages = numOfPages;
@@ -183,6 +164,4 @@ public class Books {
 		bookItems.add(bookItem);
 	}
 
-	
-	
 }

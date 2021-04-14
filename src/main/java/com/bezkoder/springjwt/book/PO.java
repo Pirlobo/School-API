@@ -1,32 +1,26 @@
 package com.bezkoder.springjwt.book;
 
-
-import java.sql.Date;
-
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 @Entity
 @Table(name = "purchaseOrder")
 public class PO {
-	
+
 	@Id
 	@GeneratedValue
 	private Integer id;
-	
+
 	@ManyToOne
 	@JsonIgnore
-	private Orders orders; 
-	
+	private Orders orders;
+
 	private Double quantity;
-	
+
 	@ManyToOne
 	private BookItems bookItems;
 
@@ -66,14 +60,10 @@ public class PO {
 		this.orders = orders;
 	}
 
-	public PO( double quantity) {
+	public PO(double quantity) {
 		super();
 		this.quantity = quantity;
-		
+
 	}
-
-	
-	
-
 
 }

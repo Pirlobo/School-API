@@ -1,10 +1,8 @@
 package com.bezkoder.springjwt.models;
 
 import java.sql.Date;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,37 +10,30 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureParameter;
 import javax.persistence.Table;
-
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.bezkoder.springjwt.book.Books;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import antlr.debug.NewLineEvent;
 
 @Entity
 @Table(name = "course")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@NamedStoredProcedureQuery(name = "test", 
-procedureName = "test", parameters = {
-  @StoredProcedureParameter(mode = ParameterMode.IN, name = "input_year", type = Integer.class),
-  @StoredProcedureParameter(mode = ParameterMode.IN, name = "title", type = String.class),
-  @StoredProcedureParameter(mode = ParameterMode.OUT, name = "count", type = Integer.class)
-  
+@NamedStoredProcedureQuery(name = "test", procedureName = "test", parameters = {
+		@StoredProcedureParameter(mode = ParameterMode.IN, name = "input_year", type = Integer.class),
+		@StoredProcedureParameter(mode = ParameterMode.IN, name = "title", type = String.class),
+		@StoredProcedureParameter(mode = ParameterMode.OUT, name = "count", type = Integer.class)
+
 }
 
-		)
+)
 public class Course {
 
 	@Id
@@ -53,24 +44,20 @@ public class Course {
 	private Integer section;
 
 	private Integer available;
-	
+
 	private Integer capacity;
 
 	private Date startDay;
 
 	private Date endDay;
-	
+
 	@ManyToOne
 	@JsonIgnore
 	private Term term;
-	
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "course")
 	private List<FileDB> files;
-
-	
-
 
 	public List<FileDB> getFiles() {
 		return files;
@@ -85,15 +72,13 @@ public class Course {
 //	joinColumns = { @JoinColumn(name = "fk_course") },
 //	inverseJoinColumns = { @JoinColumn(name = "fk_book") })
 	@JsonIgnore
-	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 	private List<Books> books = new ArrayList<Books>();
-
-
 
 	public void setBooks(List<Books> books) {
 		this.books = books;
 	}
-	
+
 	public List<Books> getBooks() {
 		return books;
 	}
@@ -112,13 +97,11 @@ public class Course {
 
 //	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
 //	private List<Books> books = new ArrayList<Books>();
-	
-	@ManyToOne 
+
+	@ManyToOne
 	private Subject subject;
-	
-	
+
 	private Integer waitlist;
-	
 
 	public Integer getWaitlist() {
 		return waitlist;
@@ -227,7 +210,6 @@ public class Course {
 		this.users = users;
 		this.term = term;
 	}
-	
 
 	public Course(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
 			Integer waitlist) {
@@ -288,9 +270,9 @@ public class Course {
 	public void setRegId(Integer regId) {
 		this.regId = regId;
 	}
-	
+
 	public void addFile(FileDB file) {
-		files.add( file );
+		files.add(file);
 		file.setCourse(this);
 	}
 

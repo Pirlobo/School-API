@@ -2,8 +2,6 @@
 package com.bezkoder.springjwt.controllers;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,10 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,15 +21,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.exceptions.NullExceptionHandler;
 import com.bezkoder.springjwt.exceptions.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.ERole;
@@ -43,19 +35,14 @@ import com.bezkoder.springjwt.models.Role;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.models.StudentDto;
 import com.bezkoder.springjwt.models.VerificationToken;
-import com.bezkoder.springjwt.payload.request.AnnouncementRequest;
 import com.bezkoder.springjwt.payload.request.LoginRequest;
 import com.bezkoder.springjwt.payload.request.ResetPasswordRequest;
 import com.bezkoder.springjwt.payload.request.SignupRequest;
 import com.bezkoder.springjwt.payload.response.JwtResponse;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
-import com.bezkoder.springjwt.payload.response.ResetPasswordResponse;
-import com.bezkoder.springjwt.persistence.PasswordResetTokenRepository;
-import com.bezkoder.springjwt.security.event.OnAnnouncementEvent;
 import com.bezkoder.springjwt.security.event.OnRegistrationEvent;
 import com.bezkoder.springjwt.security.event.OnResetPasswordEvent;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
-import com.bezkoder.springjwt.security.service.CourseService;
 import com.bezkoder.springjwt.security.service.PasswordResetTokenService;
 import com.bezkoder.springjwt.security.service.UserService;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
@@ -96,7 +83,6 @@ public class AuthController {
 //		for (c = 'a'; c <= 'z'; ++c) {
 //			System.out.println(c + " ");
 //		}
-
 
 		return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId().intValue(), userDetails.getUsername(),
 				userDetails.getEmail(), roles, userDetails.isActive()));
@@ -177,16 +163,16 @@ public class AuthController {
 		JSONObject json = new JSONObject(email);
 		String fetchedEmail = json.getString("email");
 		User user = userService.findByEmail(fetchedEmail);
-		
+
 		System.out.println(user);
 		if (user == null || !user.isActive()) {
 			throw new ResourceNotFoundException("Cant find any user to send email");
 		}
-		
+
 		else {
 			Thread newThread = new Thread(() -> {
 				final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort()
-				+ request.getContextPath();
+						+ request.getContextPath();
 				eventPublisher.publishEvent(new OnResetPasswordEvent(user, appUrl));
 			});
 			newThread.start();

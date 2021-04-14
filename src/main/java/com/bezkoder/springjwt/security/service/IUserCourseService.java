@@ -10,10 +10,10 @@ public interface IUserCourseService {
 
 	// find student_course object by id
 	StudentCourse findById(StudentCourseId userCourseId);
-	
+
 	// persist student_course
-	void save (StudentCourse userCourse);
-	
+	void save(StudentCourse userCourse);
+
 	// delete student_course
 	void delete(StudentCourse userCourse);
 }

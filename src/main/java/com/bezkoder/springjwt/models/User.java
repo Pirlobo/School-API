@@ -4,31 +4,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
-import org.hibernate.FetchMode;
-import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Fetch;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.bezkoder.springjwt.book.Orders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(	name = "user", 
-		uniqueConstraints = { 
-			@UniqueConstraint(columnNames = "username"),
-			@UniqueConstraint(columnNames = "email") 
-		})
+@Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
+		@UniqueConstraint(columnNames = "email") })
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class User{
-	
+public class User {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -42,7 +32,7 @@ public class User{
 	@JsonIgnore
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private PasswordResetToken passwordResetToken;
-	
+
 	@JsonIgnore
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private VerificationToken verificationToken;
@@ -50,22 +40,20 @@ public class User{
 	@NotBlank
 	@Size(max = 50)
 	@Email
-	private String email; 
+	private String email;
 
 	@NotBlank
 	@Size(max = 120)
 	private String password;
 
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(	name = "user_roles", 
-				joinColumns = @JoinColumn(name = "user_id"), 
-				inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 
 	public User() {
 	}
-	
+
 	public User(Long id, @NotBlank @Size(max = 20) String username, @NotBlank @Size(max = 50) @Email String email,
 			@NotBlank @Size(max = 120) String password, Set<Role> roles) {
 		super();
@@ -76,24 +64,14 @@ public class User{
 		this.roles = roles;
 		this.isActive = false;
 	}
-	
-	 @OneToMany(
-		        mappedBy = "user",
-		        cascade = CascadeType.ALL,
-		        orphanRemoval = true,
-		        fetch = FetchType.LAZY
-		    )
-	 
-	 @JsonIgnore
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+
+	@JsonIgnore
 	private List<StudentCourse> courses = new ArrayList<StudentCourse>();
-	
-	 @OneToMany(
-		        mappedBy = "user",
-		        cascade = CascadeType.ALL,
-		        orphanRemoval = true,
-		        fetch = FetchType.LAZY
-		    )
-	 @JsonIgnore
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Orders> orders = new ArrayList<Orders>();
 
 	public Long getId() {
@@ -161,7 +139,7 @@ public class User{
 	}
 
 	public List<StudentCourse> getCourses() {
-		return courses;  
+		return courses;
 	}
 
 	public void setCourses(List<StudentCourse> courses) {
@@ -184,11 +162,4 @@ public class User{
 		this.password = password;
 	}
 
-
-
-	
-	 
-	 
-	
-	
 }

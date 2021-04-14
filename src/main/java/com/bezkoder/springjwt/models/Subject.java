@@ -1,9 +1,7 @@
 package com.bezkoder.springjwt.models;
 
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,13 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-
 
 @Entity
 @Table(name = "subject")
@@ -28,25 +21,23 @@ public class Subject {
 
 	@Id
 	private Integer id;
-	
+
 	@Enumerated(EnumType.STRING)
 	private SubjectName subjectName;
-	
+
 	@Enumerated(EnumType.STRING)
 	private SubjectCode subjectCode;
-	
+
 	@OneToMany(mappedBy = "subject")
 	@JsonIgnore
 	private List<Course> courses = new ArrayList<Course>();
-	
+
 	@OneToOne
 	@JsonIgnore
 	private Subject prerequisite;
-	
-	
-private String description;
-	
-	
+
+	private String description;
+
 	public String getDescription() {
 		return description;
 	}
@@ -54,7 +45,7 @@ private String description;
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	public Subject getPrerequisite() {
 		return prerequisite;
 	}
@@ -98,13 +89,14 @@ private String description;
 	public Subject() {
 		super();
 	}
-	
+
 	public void addCourse(Course course) {
 		courses.add(course);
 		course.setSubject(this);
 	}
 
-	public Subject(Integer id, SubjectName subjectName, SubjectCode subjectCode, Subject prerequisite, String description) {
+	public Subject(Integer id, SubjectName subjectName, SubjectCode subjectCode, Subject prerequisite,
+			String description) {
 		super();
 		this.id = id;
 		this.subjectName = subjectName;
@@ -112,5 +104,5 @@ private String description;
 		this.prerequisite = prerequisite;
 		this.description = description;
 	}
-	
+
 }

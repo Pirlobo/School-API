@@ -15,7 +15,7 @@ import com.bezkoder.springjwt.payload.request.EditProfileRequest;
 
 @Service
 public interface IUserService {
-	
+
 	ResponseEntity<?> editProfile(EditProfileRequest editProfileRequest);
 
 	// create password reset token for a student
@@ -42,18 +42,17 @@ public interface IUserService {
 
 	// place order from buying or renting Book Items
 	Orders placeOrder(List<BookItemDto> bookItemDto);
-	
-	
+
 	User findByEmail(String email);
-	
-	boolean existsByEmail (String email);
-	
-	boolean existsByUsername (String userName);
-	
+
+	boolean existsByEmail(String email);
+
+	boolean existsByUsername(String userName);
+
 	void save(User user);
-	
+
 	User findByUsername(String userName);
-	
+
 	List<User> findAllUsers();
 
 }

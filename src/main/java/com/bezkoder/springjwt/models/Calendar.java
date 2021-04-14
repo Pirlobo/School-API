@@ -1,13 +1,11 @@
 package com.bezkoder.springjwt.models;
-import java.sql.Date;
 
+import java.sql.Date;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 
 @Entity
 @Table(name = "calendar")
@@ -16,10 +14,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 public class Calendar {
 	@Id
 	private Integer id;
-	
 
 	private Date defaultDate;
-
 
 	public Integer getId() {
 		return id;
@@ -35,20 +31,16 @@ public class Calendar {
 		this.defaultDate = defaultDate;
 	}
 
-
 	public Date getDefaultDate() {
 		return defaultDate;
 	}
-
 
 	public void setDefaultDate(Date defaultDate) {
 		this.defaultDate = defaultDate;
 	}
 
-
 	public Calendar() {
 		super();
 	}
-	
-	
+
 }

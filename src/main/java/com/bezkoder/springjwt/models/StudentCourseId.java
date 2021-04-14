@@ -1,15 +1,13 @@
 package com.bezkoder.springjwt.models;
 
 import java.io.Serializable;
-
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
 public class StudentCourseId implements Serializable {
-	
+
 	private Long id;
-	
+
 	private Integer regId;
 
 	public Integer getRegId() {
@@ -26,8 +24,6 @@ public class StudentCourseId implements Serializable {
 		this.regId = regId;
 	}
 
-
-
 	public Long getId() {
 		return id;
 	}
@@ -39,7 +35,5 @@ public class StudentCourseId implements Serializable {
 	public StudentCourseId() {
 		super();
 	}
-	
-	
-	
+
 }

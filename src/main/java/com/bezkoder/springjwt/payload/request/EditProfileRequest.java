@@ -1,7 +1,7 @@
 package com.bezkoder.springjwt.payload.request;
 
 public class EditProfileRequest {
-	
+
 	private String email;
 
 	public String getEmail() {
@@ -20,7 +20,5 @@ public class EditProfileRequest {
 	public EditProfileRequest() {
 		super();
 	}
-	
-	
 
 }

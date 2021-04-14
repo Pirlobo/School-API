@@ -1,7 +1,6 @@
 package com.bezkoder.springjwt.dto;
 
 import java.sql.Date;
-import java.sql.Time;
 
 public class CourseDto {
 	private Integer regId;
@@ -9,37 +8,36 @@ public class CourseDto {
 	private Integer section;
 
 	private Integer available;
-	
+
 	private Integer capacity;
 
 	private Date startDay;
 
 	private Date endDay;
-	
+
 	private Integer waitlist;
-	
+
 	private String title;
-	
+
 	private String room;
-	
+
 	private String instructor;
-	
+
 	private String from;
-	
+
 	private String to;
-	
+
 	private String prerequisite;
-	
+
 	private String term;
-	
+
 	private String courseDescription;
-	
+
 	private String year;
-	
+
 	String registerStatus;
-	
-	private Integer rank; 
-	
+
+	private Integer rank;
 
 	public Integer getRank() {
 		return rank;
@@ -153,8 +151,6 @@ public class CourseDto {
 		this.instructor = instructor;
 	}
 
-	
-
 	public String getFrom() {
 		return from;
 	}
@@ -180,7 +176,8 @@ public class CourseDto {
 	}
 
 	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
-			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite, String term, String courseDescription, String year, String registerStatus, Integer rank) {
+			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite,
+			String term, String courseDescription, String year, String registerStatus, Integer rank) {
 		super();
 		this.regId = regId;
 		this.section = section;
@@ -201,8 +198,10 @@ public class CourseDto {
 		this.registerStatus = registerStatus;
 		this.rank = rank;
 	}
+
 	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
-			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite, String term, String courseDescription, String year, String registerStatus) {
+			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite,
+			String term, String courseDescription, String year, String registerStatus) {
 		super();
 		this.regId = regId;
 		this.section = section;
@@ -221,11 +220,12 @@ public class CourseDto {
 		this.courseDescription = courseDescription;
 		this.year = year;
 		this.registerStatus = registerStatus;
-		
+
 	}
-	
+
 	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
-			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite, String term, String courseDescription, String year) {
+			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite,
+			String term, String courseDescription, String year) {
 		super();
 		this.regId = regId;
 		this.section = section;
@@ -252,10 +252,5 @@ public class CourseDto {
 	public void setTerm(String term) {
 		this.term = term;
 	}
-
-	
-	
-	
-	
 
 }

@@ -2,7 +2,6 @@ package com.bezkoder.springjwt.payload.response;
 
 import java.util.List;
 
-
 public class JwtResponse {
 	private String token;
 	private String type = "Bearer";
@@ -11,7 +10,7 @@ public class JwtResponse {
 	private String email;
 	private List<String> roles;
 	private boolean isAcive;
-	
+
 	public boolean isAcive() {
 		return isAcive;
 	}
@@ -48,7 +47,8 @@ public class JwtResponse {
 		this.isAcive = isAcive;
 	}
 
-	public JwtResponse(String accessToken, Integer id, String username, String email, List<String> roles, boolean isAcitve) {
+	public JwtResponse(String accessToken, Integer id, String username, String email, List<String> roles,
+			boolean isAcitve) {
 		this.token = accessToken;
 		this.id = id;
 		this.username = username;
