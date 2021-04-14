@@ -54,10 +54,10 @@ public class BookService implements IBookService {
 	}
 
 	@Override
-	public Map<String, List<BookDto>> getResultMap(String userName) {
+	public Map<String, List<BookDto>> getResultMap() {
 		Map<String, List<BookDto>> resultMap  = new HashMap<String, List<BookDto>>();
 		
-		User user  = userRepository.findByUsername(userName).orElse(null);
+		User user  = userService.getCurrentLoggedUser();
 		
 		List<Course> courses = userService.getYourClasses(user);
 		

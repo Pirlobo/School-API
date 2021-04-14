@@ -66,9 +66,6 @@ public class CourseService implements ICourseService {
 	private UserService userService;
 	
 	@Autowired
-	private UserRepository userRepository;
-	
-	@Autowired
 	CourseService courseService;
 	
 	@Autowired
@@ -114,10 +111,9 @@ public class CourseService implements ICourseService {
 
 	@Override
 	// @Cacheable(value = "courseCache")
-	public Set<Books> getAllRequiredBooks(String userName) {
+	public Set<Books> getAllRequiredBooks() {
 		Set<Books> bookList = new HashSet<Books>();
-		User user = userRepository.findByUsername(userName).orElse(null);
-		List<Course> courses = userService.getYourClasses(user);
+		List<Course> courses = courseService.getIPCourses();
 		courses.forEach(e -> {
 			List<Books> books = e.getBooks();
 			bookList.addAll(books);

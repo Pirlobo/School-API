@@ -29,6 +29,7 @@ import com.bezkoder.springjwt.book.PO;
 import com.bezkoder.springjwt.book.RO;
 import com.bezkoder.springjwt.dto.BookItemDto;
 import com.bezkoder.springjwt.dto.CourseDto;
+import com.bezkoder.springjwt.exceptions.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.IsPassed;
 import com.bezkoder.springjwt.models.PasswordResetToken;
@@ -194,7 +195,11 @@ public class UserService implements IUserService {
 
 		userCourseIds.forEach(e -> {
 			StudentCourse userCourse = userCourseService.findById(e);
-			userCourses.add(userCourse);
+			if (userCourse.getIsPassed() == IsPassed.IP) {
+				userCourses.add(userCourse);
+			} else {
+				throw new ResourceNotFoundException("Could not find");
+			}
 		});
 		
 		userCourses.forEach(e -> {

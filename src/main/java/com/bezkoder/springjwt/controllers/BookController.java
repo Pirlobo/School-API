@@ -74,15 +74,15 @@ public class BookController {
 
 	}
 
-	@GetMapping("/getAllRequiredBooks/{userName}")
-	public ResponseEntity<?> getAllRequiredBooks(@PathVariable String userName) {
-		Set<Books> bookList = courseService.getAllRequiredBooks(userName);
+	@GetMapping("/getAllRequiredBooks")
+	public ResponseEntity<?> getAllRequiredBooks() {
+		Set<Books> bookList = courseService.getAllRequiredBooks();
 		if (bookList.size() == 0) {
 			throw new ResourceNotFoundException("Cant find any book");
 		}
 		// 	Key : Course's title
 		// Value : List of Books required for the course/s
-		Map<String, List<BookDto>> resultMap = bookService.getResultMap(userName);
+		Map<String, List<BookDto>> resultMap = bookService.getResultMap();
 		return ResponseEntity.ok(resultMap);
 	}
 	

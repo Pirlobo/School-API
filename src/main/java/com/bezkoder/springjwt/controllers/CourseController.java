@@ -130,9 +130,16 @@ public class CourseController {
 	}
 
 	// get Current Registered Classes
-	@GetMapping("/getRegisteredClasses")
-	public ResponseEntity<?> getRegisteredClasses() {
+	@GetMapping("/getCurrentRegisteredClasses")
+	public ResponseEntity<?> getCurrentRegisteredClasses() {
 		List<Course> registeredCourses = courseService.getIPCourses();
+		List<CourseDto> courseDtos = courseService.coursesToCourseDtos(registeredCourses);
+		return ResponseEntity.ok(courseDtos);
+	}
+	@GetMapping("/getAllRegisteredClasses")
+	public ResponseEntity<?> getAllRegisteredClasses() {
+		User user = userService.getCurrentLoggedUser();
+		List<Course> registeredCourses = userService.getYourClasses(user);
 		List<CourseDto> courseDtos = courseService.coursesToCourseDtos(registeredCourses);
 		return ResponseEntity.ok(courseDtos);
 	}

@@ -26,7 +26,7 @@ public interface IBookService {
 	// find books by id (isbn)
 	Books findById(Integer id);
 	
-	public Map<String, List<BookDto>> getResultMap(String userName);
+	public Map<String, List<BookDto>> getResultMap();
 		
 	
 	

@@ -40,7 +40,7 @@ public interface ICourseService {
 	List<CourseDto> searchCourses(String subject);
 
 	// get all required books of a student
-	Set<Books> getAllRequiredBooks( String userName);
+	Set<Books> getAllRequiredBooks();
 
 	// get all registered classes of a student
 	public List<Course> findRegisteredClasses(List<Integer> regIdClasses);
