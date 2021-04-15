@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.mail.Flags.Flag;
+
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -124,24 +127,12 @@ public class CourseService implements ICourseService {
 		List<Course> registeredCourses = userService.getYourClasses(user);
 		List<Course> courses2 = findRegisteredClasses(regIdClasses);
 		courses2.forEach(e -> {
-			if (!(isPreregquisited(user, e))) {
+			boolean isPreregquisited = (isPreregquisited(user, e));
+			if (isPreregquisited == false) {
 				System.out.println("a");
 				failedRegisteredClasses.add(e);
-			} else {
-				System.out.println("b");
-				List<Course> currentCourses = userService.getYourClasses(user);
-				for (int i = 0; i < currentCourses.size(); i++) {
-					if (currentCourses.get(i).getTerm().getSemester().toString()
-							.equals(e.getTerm().getSemester().toString())) {
-						if (currentCourses.get(i).getTerm().getYear() == e.getTerm().getYear()) {
-							System.out.println("d");
-							failedRegisteredClasses.add(e);
-						}
-					}
-
-				}
-
 			}
+
 			if (!isNotTimeConflicted(user, e, regIdClasses)) {
 				System.out.println("c");
 				failedRegisteredClasses.add(e);
@@ -209,9 +200,10 @@ public class CourseService implements ICourseService {
 	@Override
 	public boolean isPreregquisited(User user, Course course) {
 		List<Course> registeredCourses = userService.getYourClasses(user);
-
 		if (course.getSubject().getPrerequisite() != null) {
-
+			if (registeredCourses.size() == 0) {
+				return false;
+			}
 			for (int i = 0; i < registeredCourses.size(); i++) {
 				StudentCourse userCourse = studentCourseRepository.findStudentCourseById(user.getId(),
 						registeredCourses.get(i).getRegId());
@@ -225,8 +217,9 @@ public class CourseService implements ICourseService {
 				}
 			}
 			return true;
+		} else {
+			return true;
 		}
-		return true;
 	}
 
 	@Override
