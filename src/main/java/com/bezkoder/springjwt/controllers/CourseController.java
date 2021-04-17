@@ -51,8 +51,8 @@ public class CourseController {
 	private PaginationService paginationService;
 
 	@Cacheable(value = "courseCache")
-	@RequestMapping("/searchCoursesByTitle")
-	public ResponseEntity<?> getCourseByTitle(@RequestParam("search") String search) {
+	@RequestMapping("/searchCoursesByTeacherOrTitle")
+	public ResponseEntity<?> getCourseByTeacherOrTitle(@RequestParam("search") String search) {
 		return findPaginated(1, search, "reg_id", "asc");
 	}
 

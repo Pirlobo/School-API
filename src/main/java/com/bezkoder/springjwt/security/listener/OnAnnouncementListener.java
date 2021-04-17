@@ -7,6 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.security.event.OnAnnouncementEvent;
+import com.bezkoder.springjwt.security.event.OnRegistrationEvent;
 
 @Component
 public class OnAnnouncementListener implements ApplicationListener<OnAnnouncementEvent> {
@@ -21,18 +22,17 @@ public class OnAnnouncementListener implements ApplicationListener<OnAnnouncemen
 
 	private void confirmAnnounement(final OnAnnouncementEvent event, String[] receiptAdresses, String content) {
 		final User user = event.getUser();
-
 		final SimpleMailMessage email = constructEmailMessage(event, user, receiptAdresses, content);
 		mailSender.send(email);
 	}
 
+	// Send any important information to all students
 	private SimpleMailMessage constructEmailMessage(final OnAnnouncementEvent event, final User user,
 			String[] receiptAdresses, String content) {
-		final String subject = "Announement";
 		final SimpleMailMessage email = new SimpleMailMessage();
 		email.setFrom(user.getEmail());
 		email.setTo(receiptAdresses);
-		email.setSubject(subject);
+		email.setSubject("Announement");
 		email.setText(content);
 		return email;
 	}

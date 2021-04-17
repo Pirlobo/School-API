@@ -32,7 +32,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		try {
 			String jwt = parseJwt(request);
-//			String cookie = getCookieValue(request, "JSESSIONID");
 			if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 				String username = jwtUtils.getUserNameFromJwtToken(jwt);
 				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -42,7 +41,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 		} catch (Exception e) {
-			System.out.println("not jwt");
 			logger.error("Cannot set user authentication: {}", e);
 		}
 
@@ -57,11 +55,4 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
 		return null;
 	}
-//	private String getCookieValue(HttpServletRequest req, String cookieName) {
-//	    return Arrays.stream(req.getCookies())
-//	            .filter(c -> c.getName().equals(cookieName))
-//	            .findFirst()
-//	            .map(Cookie::getValue)
-//	            .orElse(null);
-//	}
 }

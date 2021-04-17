@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.dto.CourseStudentDto;
+import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.StudentCourse;
+import com.bezkoder.springjwt.models.Teacher;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.AnnouncementRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
@@ -43,16 +45,19 @@ public class TeacherController {
 	@Autowired
 	private TeacherService teacherService;
 
+	// get all courses belong to a particular teacher
 	@GetMapping("/manageCourses")
 	@Cacheable(value = "courseCache")
 	public ResponseEntity<?> manageCourses() {
-		List<CourseDto> courseDtos = courseService.coursesToCourseDtos(courseService.findAll());
+		Teacher teacher = teacherService.findTeacherByUser(userService.getCurrentLoggedUser());
+		List<CourseDto> courseDtos = courseService.coursesToCourseDtos(teacher.getCourses());
 		return ResponseEntity.ok(courseDtos);
 	}
 
+	// Send any important information to all students
 	@PostMapping("/sendAnnounement")
 	public ResponseEntity<?> sendAnnounement(@RequestBody AnnouncementRequest announcementRequest) {
-		User user = userService.findByUsername(announcementRequest.getUserName());
+		User user = userService.getCurrentLoggedUser();
 		List<User> users = userService.findAllUsers();
 		List<String> emaiList = users.stream().map(u -> u.getEmail()).collect(Collectors.toList());
 		String[] receiptAdresses = emaiList.toArray(new String[emaiList.size()]);
@@ -63,6 +68,7 @@ public class TeacherController {
 		return ResponseEntity.ok(new MessageResponse("Sent"));
 	}
 
+	// aimed to drop students who does not attend the first class
 	@PostMapping("/drop")
 	public ResponseEntity<?> dropClasses(@RequestBody String dropClassesRequest) {
 		JSONObject json = new JSONObject(dropClassesRequest);
@@ -78,6 +84,7 @@ public class TeacherController {
 		return ResponseEntity.ok(studentCourses);
 	}
 
+	// get all students belong to a particular course to be rendered in the page
 	@GetMapping("/studentInfo/{regId}")
 	public ResponseEntity<?> sendAnnounement(@PathVariable Integer regId) {
 		List<CourseStudentDto> courseStudentDtos = courseService.courseToCourseStudentDtos(regId);

@@ -28,6 +28,7 @@ public class FileController {
   @Autowired
   private FileStorageService storageService;
 
+  // allow teacher to upload syllabus to a particular course
   @PostMapping("/upload")
   public ResponseEntity<MessageResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("regId") Integer regId) {
     String message = "";
@@ -41,7 +42,7 @@ public class FileController {
     }
   }
 
-//  @GetMapping("/files/{regId}")
+  // get syllabus of a course
   @GetMapping(value = "/getFiles/{regId}")
   public ResponseEntity<List<ResponseFile>> getListFiles(@PathVariable("regId") Integer regId) {
     List<ResponseFile> files = storageService.getAllFilesById(regId).map(dbFile -> {

@@ -28,6 +28,18 @@ public class User {
 	@Column(unique = true)
 	private String username;
 	private boolean isActive;
+	
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private Teacher teacher;
+
+	public Teacher getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(Teacher teacher) {
+		this.teacher = teacher;
+	}
 
 	@JsonIgnore
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

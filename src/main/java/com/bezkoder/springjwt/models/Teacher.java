@@ -7,7 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 //@Table(name = "teacher")
@@ -21,21 +25,32 @@ public class Teacher {
 
 	private String name;
 
+	@OneToOne
+	@JsonIgnore
+	private User user;
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
 	private List<Course> courses = new ArrayList<Course>();
 
-	public Teacher(Integer id, String name) {
+	
+
+	public Teacher(Integer id, User user) {
 		super();
 		this.id = id;
-		this.name = name;
-
-	}
-
-	public Teacher(Integer id, String name, List<Course> courses) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.courses = courses;
+		if (user != null) {
+			this.name = user.getUsername();
+		} else {
+			this.name = "Not planned yet";
+		}
+		this.user = user;
 	}
 
 	public Teacher() {

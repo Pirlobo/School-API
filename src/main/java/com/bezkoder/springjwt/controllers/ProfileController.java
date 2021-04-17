@@ -18,7 +18,7 @@ public class ProfileController {
 	@Autowired
 	private UserService userService;
 
-	@PostMapping("editProfile")
+	@PostMapping("/editProfile")
 	public ResponseEntity<?> editProfile(@RequestBody EditProfileRequest editProfileRequest) {
 		ResponseEntity<?> responseEntity = userService.editProfile(editProfileRequest);
 		return responseEntity;

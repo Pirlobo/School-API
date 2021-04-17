@@ -14,14 +14,19 @@ import com.bezkoder.springjwt.models.User;
 @Service
 public interface ICourseService {
 
+	// get all courses which has IP status (In Progress)
 	List<Course> getIPCourses();
 
+	// convert to dto object
 	List<CourseDto> coursesToCourseDtos(List<Course> courses);
 
+	// convert to dto object
 	List<Integer> convertJsonArrayCoursesToRegIds(JSONArray jSONArray);
 
+	// convert to dto object
 	List<Course> convertJsonToCourses(JSONArray jSONArray);
 
+	// find Course by Id
 	Course findCourseById(Integer id);
 
 	// search classes by subject
@@ -48,16 +53,11 @@ public interface ICourseService {
 	// get all selected courses can not be registered
 	Set<Course> getFailedRegisteredClasses(User user, List<Course> courses, List<Integer> regIdClasses);
 
-	// get all selected course can be registered
-	List<Course> getSuccessfullRegisteredClasses(User user, List<Course> courses, List<Integer> regIdClasses);
-
 	// is course repeated
 	boolean isRepeated(User user, Course course);
 
 	// check whether selected classes is/are duplicated
 	boolean isDuplicated(List<Integer> regIdClasses);
-
-	List<Course> getFilterdUnDuplicatedCourses(User user, List<Integer> regIdClasses);
 
 	// check whether the taken course is passed
 	boolean isPassed(User user, Course course);
@@ -73,21 +73,19 @@ public interface ICourseService {
 	// check is any selected course conflicted
 	public boolean isCourseConflicted(User user, List<Integer> regIdClasses);
 
-	// return a list of courses which are not conflicted to be able to register
-	public List<Course> getUnconflictedCourse(User user, List<Integer> regIdClasses);
-
-	// check whether selected courses is/are already registered ?
-	public Integer checkRegisteredCourses(User user, List<Integer> regIdClasses);
-
 	// check at least one class is selected in order to register
 	public boolean isAnyCourseSelected(List<Integer> regIdClasses);
 
+	// find all courses
 	List<Course> findAll();
 
+	// convert to dto object
 	List<CourseStudentDto> courseToCourseStudentDtos(Integer regId);
 
+	// get the first ? pageSize courses for every page and sorted by Id
 	Page<Course> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection);
 
+	// get the first ? pageSize courses for every page and sorted by Id with writing query
 	public Page<Course> findPaginatedByTitle(Integer year, String title, int pageNo, int pageSize, String sortField,
 			String sortDirection);
 

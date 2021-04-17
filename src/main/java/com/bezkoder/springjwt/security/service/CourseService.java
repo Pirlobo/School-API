@@ -158,26 +158,6 @@ public class CourseService implements ICourseService {
 		return failedRegisteredClasses;
 	}
 
-	// get successfullRegisteredClasses by extracting from the method
-	// getFailedRegisteredClasses()
-	@Override
-	public List<Course> getSuccessfullRegisteredClasses(User user, List<Course> courses, List<Integer> regIdClasses) {
-		List<Course> registeredCourses = userService.getYourClasses(user);
-		Set<Course> failedRegisteredCourses = getFailedRegisteredClasses(user, registeredCourses, regIdClasses);
-		List<Course> successfullRegisteredClasses = findRegisteredClasses(regIdClasses);
-
-		List<Course> a = new ArrayList<>(failedRegisteredCourses);
-		for (int i = 0; i < failedRegisteredCourses.size(); i++) {
-			for (int j = 0; j < successfullRegisteredClasses.size(); j++) {
-				if (a.get(i).getRegId() == successfullRegisteredClasses.get(j).getRegId()) {
-					successfullRegisteredClasses.remove(j);
-				}
-			}
-		}
-
-		return successfullRegisteredClasses;
-	}
-
 	@Override
 	public void setAvailable(Integer available, Integer id) {
 		courseRepository.setAvailable(available, id);
@@ -265,7 +245,6 @@ public class CourseService implements ICourseService {
 	@Override
 	public boolean isDuplicated(List<Integer> regIdClasses) {
 		List<Course> checkedCourses = findRegisteredClasses(regIdClasses);
-		System.out.println(checkedCourses.get(0).getRegId());
 		for (int i = 0; i < checkedCourses.size(); i++) {
 
 			for (int j = i + 1; j < checkedCourses.size(); j++) {
@@ -278,43 +257,6 @@ public class CourseService implements ICourseService {
 
 		}
 		return false;
-	}
-
-	@Override
-	public List<Course> getFilterdUnDuplicatedCourses(User user, List<Integer> regIdClasses) {
-		List<Course> unDuplicatedCourses = findRegisteredClasses(regIdClasses);
-		System.out.println(unDuplicatedCourses.size());
-		List<Course> removedCourses = findRegisteredClasses(regIdClasses);
-		for (int i = 0; i < removedCourses.size(); i++) {
-
-			for (int j = i + 1; j < removedCourses.size(); j++) {
-				if (removedCourses.get(i).getSubject().getSubjectCode().toString()
-						.equals(removedCourses.get(j).getSubject().getSubjectCode().toString())) {
-
-					Course removedCourse = removedCourses.get(i);
-
-					removedCourses.forEach(e -> {
-						if (e.getSubject().getSubjectCode() == removedCourse.getSubject().getSubjectCode()) {
-							unDuplicatedCourses.remove(e);
-						}
-					});
-
-				}
-
-			}
-
-		}
-		List<Course> registeredCourses = userService.getYourClasses(user);
-
-		List<Integer> regId = new ArrayList<Integer>();
-		unDuplicatedCourses.forEach(e -> {
-			regId.add(e.getRegId());
-		});
-
-		List<Course> successfullRegisteredCourses = getSuccessfullRegisteredClasses(userService.getCurrentLoggedUser(),
-				registeredCourses, regId);
-		return successfullRegisteredCourses;
-
 	}
 
 	// return true if course is not conflicted
@@ -381,47 +323,6 @@ public class CourseService implements ICourseService {
 		return unConflictedCourses;
 	}
 
-	// 1 -> getUnconflictedCourses are all registered
-	// 2 -> getUnconflictedCourses require pre course
-	// 3-> One or more of the selected courses is already registered
-	// 4 -> getUnconflictedCourses.size() = 0
-	public Integer checkRegisteredCourses(User user, List<Integer> regIdClasses) {
-		int a = 0;
-		List<Course> registeredClasses = getUnconflictedCourse(user, regIdClasses);
-		if (registeredClasses.size() == 0) {
-			return 4;
-		}
-		System.out.println(registeredClasses.size());
-		List<Course> courses = userService.getYourClasses(user);
-		if ((courseService.getFailedRegisteredClasses(userService.getCurrentLoggedUser(), courses, regIdClasses))
-				.size() == 0) {
-
-			userService.registerForClassess(userService.getCurrentLoggedUser(), registeredClasses);
-			return 1;
-		} else {
-			for (int i = 0; i < registeredClasses.size(); i++) {
-				if (!(courseService.isPreregquisited(user, registeredClasses.get(i)))) {
-					a++;
-				} else {
-					List<Course> c = new ArrayList<Course>();
-					c.add(registeredClasses.get(i));
-					userService.registerForClassess(userService.getCurrentLoggedUser(), c);
-
-				}
-
-			}
-			if (a > 0) {
-
-				return 2;
-			}
-			List<Course> courses2 = courseService.getSuccessfullRegisteredClasses(userService.getCurrentLoggedUser(),
-					courses, regIdClasses);
-			userService.registerForClassess(userService.getCurrentLoggedUser(), courses2);
-
-			return 3;
-		}
-	}
-
 	public boolean isAnyCourseSelected(List<Integer> regIdClasses) {
 		if (regIdClasses == null) {
 			return false;
@@ -468,7 +369,6 @@ public class CourseService implements ICourseService {
 			}
 			StudentCourseId studentCourseId = new StudentCourseId(user.getId(), e.getRegId());
 			studentCourse = userCourseService.findById(studentCourseId);
-			System.out.println(user.getId());
 			if (studentCourse != null) {
 				registerStatus = studentCourse.getUserCourseStatus().toString();
 				registerRank = studentCourse.getWaitlistedRank();

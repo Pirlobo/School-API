@@ -8,8 +8,10 @@ import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.StudentCourse;
 import com.bezkoder.springjwt.models.StudentCourseId;
 import com.bezkoder.springjwt.models.StudentCourseStatus;
+import com.bezkoder.springjwt.models.Teacher;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.persistence.StudentCourseRepository;
+import com.bezkoder.springjwt.persistence.TeacherRepository;
 
 @Service
 public class TeacherService  implements ITeacherService{
@@ -22,6 +24,9 @@ public class TeacherService  implements ITeacherService{
 	
 	@Autowired
 	private StudentCourseRepository studentCourseRepository;
+	
+	@Autowired
+	private TeacherRepository teacherRepository;
 
 	@Override
 	public List<StudentCourse> dropClasses(List<User> users, Integer regId) {
@@ -66,6 +71,12 @@ public class TeacherService  implements ITeacherService{
 		});
 		return userCourses;
 
+	}
+
+	@Override
+	public Teacher findTeacherByUser(User user) {
+		Teacher teacher = teacherRepository.findTeacherByUser(user.getId());
+		return teacher;
 	}
 
 }
