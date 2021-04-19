@@ -58,6 +58,18 @@ public class Course {
 	@JsonIgnore
 	@OneToMany(mappedBy = "course")
 	private List<FileDB> files;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "course")
+	private List<Assignment> assignments;
+
+	public List<Assignment> getAssignments() {
+		return assignments;
+	}
+
+	public void setAssignments(List<Assignment> assignments) {
+		this.assignments = assignments;
+	}
 
 	public List<FileDB> getFiles() {
 		return files;
@@ -275,5 +287,8 @@ public class Course {
 		files.add(file);
 		file.setCourse(this);
 	}
-
+	public void addAssignment(Assignment assignment) {
+		assignments.add(assignment);
+		assignment.setCourse(this);
+	}
 }

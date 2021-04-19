@@ -12,7 +12,7 @@ import com.bezkoder.springjwt.security.service.UserService;
 
 @RestController
 @RequestMapping("/api/profile")
-@CrossOrigin("http://localhost:8081")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class ProfileController {
 
 	@Autowired

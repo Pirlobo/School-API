@@ -68,7 +68,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			// We are using JWT which can be authenticated by itself. Hence, we dont need JSESSIONID, so we set stateless
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests().antMatchers("/api/auth/**", "/registrationConfirm*" , "/getCurrentUser").permitAll()
-			.antMatchers("/api/test/**", "/login").permitAll()
+			.antMatchers("/login").permitAll()
+			.antMatchers("/api/upload").hasAnyAuthority("ROLE_TEACHER")
+			.antMatchers("/api/uploadAssignment").hasAnyAuthority("ROLE_TEACHER")
 			.antMatchers("/api/course/**").hasAnyAuthority("ROLE_USER")
 			.antMatchers("/api/teacher/**").hasAnyAuthority("ROLE_TEACHER")
 			.antMatchers("/api/profile/editProfile").hasAnyAuthority("ROLE_USER")
