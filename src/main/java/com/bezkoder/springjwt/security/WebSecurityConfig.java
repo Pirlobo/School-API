@@ -1,7 +1,6 @@
 package com.bezkoder.springjwt.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -67,7 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			// We are using JWT which can be authenticated by itself. Hence, we dont need JSESSIONID, so we set stateless
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/api/auth/**", "/registrationConfirm*" , "/getCurrentUser").permitAll()
+			.authorizeRequests().antMatchers("/api/auth/**", "/registrationConfirm*", "/api/assignments/**", "/api/files/**", "/getCurrentUser").permitAll()
 			.antMatchers("/login").permitAll()
 			.antMatchers("/api/upload").hasAnyAuthority("ROLE_TEACHER")
 			.antMatchers("/api/uploadAssignment").hasAnyAuthority("ROLE_TEACHER")

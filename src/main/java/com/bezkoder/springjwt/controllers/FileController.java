@@ -73,30 +73,39 @@ public class FileController {
 	@GetMapping(value = "/getFiles/{regId}")
 	public ResponseEntity<List<ResponseFile>> getListFiles(@PathVariable("regId") Integer regId) {
 		List<ResponseFile> files = storageService.getAllFilesById(regId).map(dbFile -> {
-			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/files/")
+			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/files/")
 					.path(dbFile.getId()).toUriString();
-			
+
 			return new ResponseFile(dbFile.getName(), fileDownloadUri, dbFile.getType(), dbFile.getData().length);
 		}).collect(Collectors.toList());
 
 		return ResponseEntity.status(HttpStatus.OK).body(files);
 	}
-	@GetMapping(value = "/getAssignments/{regId}")
-	public ResponseEntity<List<AssignmentResponse>> getAssignments(@PathVariable("regId") Integer regId) {
-		List<AssignmentResponse> files = assignmentService.getAllFilesById(regId).map(dbFile -> {
-			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/files/")
-					.path(dbFile.getId().toString()).toUriString();
-			
-			return new AssignmentResponse(dbFile.getName(), fileDownloadUri, dbFile.getType(), dbFile.getData().length, dbFile.getDescription(), dbFile.getPoints(), dbFile.getDate());
-		}).collect(Collectors.toList());
 
+	@GetMapping(value = "/getAssignments/{regId}")
+	public ResponseEntity<List<AssignmentResponse>> getAllAssignmentsByCourse(@PathVariable("regId") Integer regId) {
+		List<AssignmentResponse> files = assignmentService.getAllFilesById(regId).map(dbFile -> {
+			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/assignments/")
+					.path(dbFile.getId()).toUriString();
+
+			return new AssignmentResponse(dbFile.getName(), fileDownloadUri, dbFile.getType(), dbFile.getData().length,
+					dbFile.getDescription(), dbFile.getPoints(), dbFile.getDate());
+		}).collect(Collectors.toList());
+		
 		return ResponseEntity.status(HttpStatus.OK).body(files);
+	}
+
+	@GetMapping("/assignments/{id}")
+	public ResponseEntity<byte[]> getAssignment(@PathVariable String id) {
+		FileDB fileDB = assignmentService.getAssignment(id);
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDB.getName() + "\"")
+				.body(fileDB.getData());
 	}
 
 	@GetMapping("/files/{id}")
 	public ResponseEntity<byte[]> getFile(@PathVariable String id) {
 		FileDB fileDB = storageService.getFile(id);
-
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDB.getName() + "\"")
 				.body(fileDB.getData());

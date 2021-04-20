@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.bezkoder.springjwt.exceptions.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.Assignment;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.FileDB;
@@ -36,4 +38,10 @@ public class AssignmentService implements IAssignmentService {
 	public Stream<Assignment> getAllFilesById(Integer regId) {
 	    return assignmentRepository.getAllFilesByCourseId(regId).stream();
 	  }
+	
+	public FileDB getAssignment(String id) {
+		Assignment assignment = assignmentRepository.findById(id).get();
+		FileDB fileDB = new FileDB(assignment.getName(), assignment.getType(), assignment.getData());
+		return fileDB;
+	}
 }
