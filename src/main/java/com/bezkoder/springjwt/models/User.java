@@ -32,6 +32,11 @@ public class User {
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private Teacher teacher;
+	
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,
+			fetch = FetchType.LAZY)
+	@JsonIgnore
+	private Transcript transcript;
 
 	public Teacher getTeacher() {
 		return teacher;
@@ -39,6 +44,14 @@ public class User {
 
 	public void setTeacher(Teacher teacher) {
 		this.teacher = teacher;
+	}
+
+	public Transcript getTranscript() {
+		return transcript;
+	}
+
+	public void setTranscript(Transcript transcript) {
+		this.transcript = transcript;
 	}
 
 	@JsonIgnore
@@ -172,6 +185,11 @@ public class User {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+	}
+	
+	public void addTranscript(Transcript transcript) {
+		transcript.setUser(this);
+		this.transcript = null;
 	}
 
 }

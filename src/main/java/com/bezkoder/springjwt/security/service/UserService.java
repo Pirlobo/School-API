@@ -3,7 +3,10 @@ package com.bezkoder.springjwt.security.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
+
+import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +20,7 @@ import com.bezkoder.springjwt.book.PO;
 import com.bezkoder.springjwt.book.RO;
 import com.bezkoder.springjwt.dto.BookItemDto;
 import com.bezkoder.springjwt.dto.CourseDto;
+import com.bezkoder.springjwt.dto.TranscriptDto;
 import com.bezkoder.springjwt.exceptions.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.IsPassed;
@@ -24,6 +28,7 @@ import com.bezkoder.springjwt.models.PasswordResetToken;
 import com.bezkoder.springjwt.models.StudentCourse;
 import com.bezkoder.springjwt.models.StudentCourseId;
 import com.bezkoder.springjwt.models.StudentCourseStatus;
+import com.bezkoder.springjwt.models.Transcript;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.models.VerificationToken;
 import com.bezkoder.springjwt.payload.request.EditProfileRequest;
@@ -80,7 +85,6 @@ public class UserService implements IUserService {
 		user.setVerificationToken(null);
 		final VerificationToken myToken = new VerificationToken(token, user);
 		verificationTokenRepository.save(myToken);
-
 	}
 
 	@Override
@@ -114,10 +118,9 @@ public class UserService implements IUserService {
 	public void registerForClassess(User user, List<Course> courses) {
 		for (int i = 0; i < courses.size(); i++) {
 			if (courseService.isAlaivable(courses.get(i))) {
-				System.out.println(user.getEmail());
 				StudentCourse userCourse = new StudentCourse(user, courses.get(i));
 				userCourse.setIsPassed(IsPassed.IP);
-				userCourse.setWaitlistedRank(courses.get(i).getWaitlist() + 1);
+				userCourse.setWaitlistedRank(courses.get(i).getCapacity() - courses.get(i).getAvailable() + 1);
 				userCourse.setUserCourseStatus(StudentCourseStatus.Successfull);
 				courseService.setAvailable(courses.get(i).getAvailable() - 1, courses.get(i).getRegId());
 				userCourseRepository.save(userCourse);
@@ -186,7 +189,7 @@ public class UserService implements IUserService {
 
 		userCourses.forEach(e -> {
 			if (e.getCourse().getWaitlist() <= 0) {
-				List<StudentCourse> afterRankList = studentCourseRepository.findAfterRank(e.getWaitlistedRank());
+				List<StudentCourse> afterRankList = studentCourseRepository.findAfterRankOfClass(e.getWaitlistedRank(), e.getCourse().getRegId());
 				afterRankList.forEach(studentCourse -> {
 					studentCourse.setWaitlistedRank(studentCourse.getWaitlistedRank() - 1);
 				});
@@ -196,12 +199,16 @@ public class UserService implements IUserService {
 				courseService.save(e.getCourse());
 				userCourseService.delete(e);
 			} else {
-				List<StudentCourse> afterRankList = studentCourseRepository.findAfterRank(e.getWaitlistedRank());
+				List<StudentCourse> afterRankList = studentCourseRepository.findAfterRankOfClass(e.getWaitlistedRank(),e.getCourse().getRegId());
+				System.out.println(e.getWaitlistedRank() + "wailist nè");
+				System.out.println(afterRankList.size() + "size nè");
 				afterRankList.forEach(studentCourse -> {
 					studentCourse.setWaitlistedRank(studentCourse.getWaitlistedRank() - 1);
+					// 2 > 1
 					if (studentCourse.getWaitlistedRank() <= e.getCourse().getCapacity()) {
 						studentCourse.setUserCourseStatus(StudentCourseStatus.Successfull);
 					}
+					
 				});
 				studentCourseRepository.saveAll(afterRankList);
 				courseService.setWailist(e.getCourse().getWaitlist() - 1, e.getCourse().getRegId());
@@ -283,7 +290,6 @@ public class UserService implements IUserService {
 	@Override
 	public void save(User user) {
 		userRepository.save(user);
-
 	}
 
 	@Override
@@ -316,4 +322,94 @@ public class UserService implements IUserService {
 
 	}
 
+	@Override
+	public List<TranscriptDto> getCourseGrades() {
+		User user = getCurrentLoggedUser();
+		List<TranscriptDto> transcriptDtos = new ArrayList<TranscriptDto>();
+		List<StudentCourse> studentCourses = user.getCourses().stream()
+				.filter(e -> e.getUserCourseStatus() == StudentCourseStatus.Successfull).collect(Collectors.toList());
+
+		studentCourses.forEach(student -> {
+			Character finalGrade;
+			try {
+				finalGrade = student.getFinalGrade().toString().charAt(0);
+			} catch (Exception e) {
+				finalGrade = null;
+			}
+			TranscriptDto transcriptDto;
+			try {
+				transcriptDto = new TranscriptDto(student.getCourse().getSubject().getSubjectCode().toString(),
+						student.getGrade().toString().charAt(0), student.getPercentage(), finalGrade,
+						student.getCourse().getTerm().getSemester().toString() + " "
+								+ String.valueOf(student.getCourse().getTerm().getYear()));
+				transcriptDtos.add(transcriptDto);
+			} catch (Exception e) {
+				transcriptDto = new TranscriptDto(student.getCourse().getSubject().getSubjectCode().toString(), null,
+						null, finalGrade, student.getCourse().getTerm().getSemester().toString() + " "
+								+ String.valueOf(student.getCourse().getTerm().getYear()));
+				transcriptDtos.add(transcriptDto);
+			}
+		});
+		
+		return transcriptDtos;
+	}
+	
+	@Override
+	public Transcript getTranscript() {
+		User user = getCurrentLoggedUser();
+		Transcript transcript = user.getTranscript();
+		return transcript;
+	}
+
+	@Override
+	public List<StudentCourse> getCompletedCourses(String userName) {
+		User user = userService.findByUsername(userName);
+		List<StudentCourse> courses = user.getCourses();
+		List<StudentCourse> finishedCourses = courses.stream().filter(e -> e.getIsPassed() != IsPassed.IP)
+				.collect(Collectors.toList());
+
+		return finishedCourses;
+	}
+
+	@Override
+	public Integer getTotalEarnedCredits(String userName) {
+		int totalEarnedCredits = 0;
+		List<StudentCourse> finishedCourses = getCompletedCourses(userName);
+		List<Course> completedClasses = new ArrayList<Course>();
+		finishedCourses.forEach(e -> {
+			completedClasses.add(e.getCourse());
+		});
+		for (int i = 0; i < completedClasses.size(); i++) {
+			totalEarnedCredits += completedClasses.get(i).getUnits();
+		}
+		return totalEarnedCredits;
+	}
+
+	@Override
+	public Integer getCorrespondingTotalGradePoints(String userName) {
+		int totalTotalGradePoints = 0;
+		List<StudentCourse> completedClasses = getCompletedCourses(userName);
+		for (int i = 0; i < completedClasses.size(); i++) {
+			switch (completedClasses.get(i).getFinalGrade()) {
+			case A:
+				totalTotalGradePoints += completedClasses.get(i).getCourse().getUnits() * 4;
+				break;
+			case B:
+				totalTotalGradePoints += completedClasses.get(i).getCourse().getUnits() * 3;
+				break;
+			case C:
+				totalTotalGradePoints += completedClasses.get(i).getCourse().getUnits() * 2;
+				break;
+			case D:
+				totalTotalGradePoints += completedClasses.get(i).getCourse().getUnits() * 1;
+				break;
+			case F:
+				totalTotalGradePoints += completedClasses.get(i).getCourse().getUnits() * 0;
+				break;
+			default:
+				break;
+			}
+		}
+		return totalTotalGradePoints;
+	}
 }

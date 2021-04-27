@@ -25,13 +25,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
 	}
-
+	@ExceptionHandler(BookExistsException.class)
+	public ResponseEntity<?> bookExistsException(BookExistsException exception, WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.ALREADY_REPORTED);
+	}
+	
+	
 	@ExceptionHandler(MaxUploadSizeExceededException.class)
 	public ResponseEntity<MessageResponse> handleMaxSizeException(MaxUploadSizeExceededException exc) {
 		return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse("File too large!"));
 	}
-
-	// handling global exception
 
 //	@ExceptionHandler(Exception.class)
 //	public ResponseEntity<?> globalExceptionHandling(Exception exception, WebRequest request){

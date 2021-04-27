@@ -35,7 +35,7 @@
 //	}
 //
 //	@GetMapping("/mod")
-//	@PreAuthorize("hasRole('MODERATOR')")
+//	@PreAuthorize("hasAuthority('MODERATOR')")
 //	public String moderatorAccess() {
 //		return "Moderator Board.";
 //	}

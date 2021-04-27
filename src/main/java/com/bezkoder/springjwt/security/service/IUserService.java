@@ -1,20 +1,24 @@
 package com.bezkoder.springjwt.security.service;
 
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.bezkoder.springjwt.book.Orders;
 import com.bezkoder.springjwt.dto.BookItemDto;
 import com.bezkoder.springjwt.dto.CourseDto;
+import com.bezkoder.springjwt.dto.TranscriptDto;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.PasswordResetToken;
+import com.bezkoder.springjwt.models.StudentCourse;
+import com.bezkoder.springjwt.models.Transcript;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.models.VerificationToken;
 import com.bezkoder.springjwt.payload.request.EditProfileRequest;
 
 @Service
 public interface IUserService {
+	
+	Transcript getTranscript();
 
 	ResponseEntity<?> editProfile(EditProfileRequest editProfileRequest);
 
@@ -54,5 +58,14 @@ public interface IUserService {
 	User findByUsername(String userName);
 
 	List<User> findAllUsers();
+	
+	// return grades of a student
+	List<TranscriptDto> getCourseGrades();
+	
+	public List<StudentCourse> getCompletedCourses (String userName);
+	
+	public Integer getTotalEarnedCredits(String userName);
+	
+	public Integer getCorrespondingTotalGradePoints(String userName);
 
 }

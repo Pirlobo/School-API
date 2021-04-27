@@ -1,5 +1,5 @@
 package com.bezkoder.springjwt.models;
 
 public enum Grade {
-	A, B, C, D, IP, W, Passed, NoPassed
+	A, B, C, D, F, IP, W, Passed, NoPassed
 }

@@ -35,9 +35,19 @@ public class CourseDto {
 
 	private String year;
 
-	String registerStatus;
+	private String registerStatus;
 
 	private Integer rank;
+	
+	private Integer units;
+
+	public Integer getUnits() {
+		return units;
+	}
+
+	public void setUnits(Integer units) {
+		this.units = units;
+	}
 
 	public Integer getRank() {
 		return rank;
@@ -177,7 +187,7 @@ public class CourseDto {
 
 	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
 			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite,
-			String term, String courseDescription, String year, String registerStatus, Integer rank) {
+			String term, String courseDescription, String year, String registerStatus, Integer rank, Integer units) {
 		super();
 		this.regId = regId;
 		this.section = section;
@@ -197,6 +207,7 @@ public class CourseDto {
 		this.year = year;
 		this.registerStatus = registerStatus;
 		this.rank = rank;
+		this.units = units;
 	}
 
 	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
@@ -225,7 +236,7 @@ public class CourseDto {
 
 	public CourseDto(Integer regId, Integer section, Integer available, Integer capacity, Date startDay, Date endDay,
 			Integer waitlist, String title, String room, String instructor, String from, String to, String prerequisite,
-			String term, String courseDescription, String year) {
+			String term, String courseDescription, String year, Integer units) {
 		super();
 		this.regId = regId;
 		this.section = section;
@@ -243,6 +254,7 @@ public class CourseDto {
 		this.term = term;
 		this.courseDescription = courseDescription;
 		this.year = year;
+		this.units = units;
 	}
 
 	public String getTerm() {

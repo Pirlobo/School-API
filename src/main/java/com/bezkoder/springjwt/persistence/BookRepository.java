@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 import com.bezkoder.springjwt.book.Books;
 
 @Repository
-public interface BookRepository extends JpaRepository<Books, Integer> {
+public interface BookRepository extends JpaRepository<Books, String> {
 
 //	
 //	@Query(value = "SELECT * FROM books where books.title like %?1%", nativeQuery = true)

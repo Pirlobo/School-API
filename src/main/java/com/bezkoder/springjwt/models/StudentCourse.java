@@ -23,18 +23,28 @@ public class StudentCourse {
 	@JsonIgnore
 	private User user;
 
+	// Current Grade of the class
 	@Enumerated(EnumType.STRING)
 	private Grade grade;
+	
+	// Final Grade of the class
+	@Enumerated(EnumType.STRING)
+	private Grade finalGrade;
 
-	@Enumerated(EnumType.ORDINAL)
-	private GPA gpa;
-
-	private Integer percentage;
+	private Double percentage;
 
 	private Integer waitlistedRank;
 
 	public Integer getWaitlistedRank() {
 		return waitlistedRank;
+	}
+
+	public Grade getFinalGrade() {
+		return finalGrade;
+	}
+
+	public void setFinalGrade(Grade finalGrade) {
+		this.finalGrade = finalGrade;
 	}
 
 	public void setWaitlistedRank(Integer waitlistedRank) {
@@ -48,11 +58,11 @@ public class StudentCourse {
 	@MapsId("regId")
 	private Course course;
 
-	public Integer getPercentage() {
+	public Double getPercentage() {
 		return percentage;
 	}
 
-	public void setPercentage(Integer percentage) {
+	public void setPercentage(Double percentage) {
 		this.percentage = percentage;
 	}
 
@@ -71,15 +81,6 @@ public class StudentCourse {
 	public void setGrade(Grade grade) {
 		this.grade = grade;
 	}
-
-	public GPA getGpa() {
-		return gpa;
-	}
-
-	public void setGpa(GPA gpa) {
-		this.gpa = gpa;
-	}
-
 	public StudentCourse() {
 		super();
 	}

@@ -6,9 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.mail.Flags.Flag;
-
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,12 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.bezkoder.springjwt.book.Books;
+import com.bezkoder.springjwt.dto.BookDto;
 import com.bezkoder.springjwt.dto.CourseDto;
 import com.bezkoder.springjwt.dto.CourseStudentDto;
 import com.bezkoder.springjwt.models.Course;
 import com.bezkoder.springjwt.models.IsPassed;
 import com.bezkoder.springjwt.models.StudentCourse;
 import com.bezkoder.springjwt.models.StudentCourseId;
+import com.bezkoder.springjwt.models.StudentCourseStatus;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.persistence.CoursePaginationRepository;
 import com.bezkoder.springjwt.persistence.CourseRepository;
@@ -77,7 +76,7 @@ public class CourseService implements ICourseService {
 			CourseDto courseDto = new CourseDto(e.getRegId(), e.getSection(), e.getAvailable(), e.getCapacity(),
 					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
 					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
-					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), null);
+					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), null, e.getUnits());
 			resultSet.add(courseDto);
 		});
 		return resultSet;
@@ -85,14 +84,18 @@ public class CourseService implements ICourseService {
 
 	@Override
 	// @Cacheable(value = "courseCache")
-	public Set<Books> getAllRequiredBooks() {
-		Set<Books> bookList = new HashSet<Books>();
-		List<Course> courses = courseService.getIPCourses();
+	public Set<BookDto> getAllRequiredBooks() {
+		Set<BookDto> bookDtos = new HashSet<BookDto>();
+		List<Course> courses = courseService.getIntendedDroppdeCourses();
 		courses.forEach(e -> {
-			List<Books> books = e.getBooks();
-			bookList.addAll(books);
+			List<Books> books = e.getBookList();
+			books.forEach(b -> {
+				BookDto bookDto = new BookDto(e.getSubject().getSubjectCode().toString() ,b.getIsbn(), b.getTitle(), b.getPublisher(),
+						b.getListOfAuthors(), b.getImageUrl());
+				bookDtos.add(bookDto);
+			} );
 		});
-		return bookList;
+		return bookDtos;
 	}
 
 	@Override
@@ -124,9 +127,15 @@ public class CourseService implements ICourseService {
 	@Override
 	public Set<Course> getFailedRegisteredClasses(User user, List<Course> courses, List<Integer> regIdClasses) {
 		Set<Course> failedRegisteredClasses = new HashSet<Course>();
-		List<Course> registeredCourses = userService.getYourClasses(user);
-		List<Course> courses2 = findRegisteredClasses(regIdClasses);
-		courses2.forEach(e -> {
+		List<Course> takenClasses = findRegisteredClasses(regIdClasses);
+		for (int i = 0; i < regIdClasses.size(); i++) {
+			Course course1 = courseRepository.findById(regIdClasses.get(i)).orElse(null);
+			if (!(isRepeated(user, course1))) {
+				System.out.println("ff");
+				failedRegisteredClasses.add(course1);
+			}
+		}
+		takenClasses.forEach(e -> {
 			boolean isPreregquisited = (isPreregquisited(user, e));
 			if (isPreregquisited == false) {
 				System.out.println("a");
@@ -134,27 +143,11 @@ public class CourseService implements ICourseService {
 			}
 
 			if (!isNotTimeConflicted(user, e, regIdClasses)) {
-				System.out.println("c");
+				System.out.println("cc");
 				failedRegisteredClasses.add(e);
 			}
+			
 		});
-
-		for (int i = 0; i < regIdClasses.size(); i++) {
-			Course course1 = courseRepository.findById(regIdClasses.get(i)).orElse(null);
-			if (!(isRepeated(user, course1))) {
-				System.out.println("f");
-				failedRegisteredClasses.add(course1);
-			}
-
-			for (int j = 0; j < registeredCourses.size(); j++) {
-				if (regIdClasses.get(i) == registeredCourses.get(j).getRegId()) {
-					System.out.println("e");
-					Course course = courseRepository.findById(regIdClasses.get(i)).orElse(null);
-					failedRegisteredClasses.add(course);
-
-				}
-			}
-		}
 		return failedRegisteredClasses;
 	}
 
@@ -180,26 +173,48 @@ public class CourseService implements ICourseService {
 	@Override
 	public boolean isPreregquisited(User user, Course course) {
 		List<Course> registeredCourses = userService.getYourClasses(user);
+		// if there is/are preq required
 		if (course.getSubject().getPrerequisite() != null) {
-			if (registeredCourses.size() == 0) {
-				return false;
-			}
 			for (int i = 0; i < registeredCourses.size(); i++) {
-				StudentCourse userCourse = studentCourseRepository.findStudentCourseById(user.getId(),
-						registeredCourses.get(i).getRegId());
 				if (registeredCourses.get(i).getSubject().getSubjectCode() == course.getSubject().getPrerequisite()
 						.getSubjectCode()) {
+					StudentCourse userCourse = studentCourseRepository.findStudentCourseById(user.getId(),
+							registeredCourses.get(i).getRegId());
 					if (userCourse.getIsPassed() == IsPassed.TRUE) {
-						continue;
+						return true;
 					} else {
 						return false;
-					}
+					}	
+				}
+				else {
+					continue;
 				}
 			}
-			return true;
+			return false;
 		} else {
+			// if there is/are no preq required, then return true
 			return true;
 		}
+	}
+
+	// all the taken classes should have the same term. For ex, fall, can not
+	// register fall and spring classes at the same time
+	// return true if all taken classes have the same term. For ins, fall 2021
+	public boolean isTheSameTerm(List<Course> courseList) {
+		for (int i = 0; i < courseList.size() - 1; i++) {
+			if (courseList.get(i).getTerm().getSemester() != courseList.get(i + 1).getTerm().getSemester()) {
+				return false;
+			} else {
+				// now term is the same, year must be also the same
+				if (courseList.get(i).getTerm().getYear() != courseList.get(i + 1).getTerm().getYear()) {
+					return false;
+				} else {
+					continue;
+				}
+			}
+		}
+		// end of the loop , return true all intended classes have the same term
+		return true;
 	}
 
 	@Override
@@ -210,31 +225,30 @@ public class CourseService implements ICourseService {
 		} else if (userCourse.getIsPassed() == (IsPassed.TRUE)) {
 			return true;
 		}
-		return true;
+		return false;
 	}
 
-	// cho repeat nếu true, otherwise false
+	// allow student to repeat the class if true, otherwise false
 	@Override
 	public boolean isRepeated(User user, Course course) {
-		List<Course> currentCourses = userService.getYourClasses(user);
-		for (int i = 0; i < currentCourses.size(); i++) {
-			if (currentCourses.get(i).getSubject().getSubjectCode().toString()
+		List<Course> registeredClasses = userService.getYourClasses(user);
+		for (int i = 0; i < registeredClasses.size(); i++) {
+			StudentCourse userCourse = userCourseService
+					.findById(new StudentCourseId(user.getId(), registeredClasses.get(i).getRegId()));
+			if (registeredClasses.get(i).getSubject().getSubjectCode().toString()
 					.equals(course.getSubject().getSubjectCode().toString())) {
-
-				if (!(isPassed(user, currentCourses.get(i)))) {
-					if (currentCourses.get(i).getTerm().getSemester().toString()
-							.equals(course.getTerm().getSemester().toString())) {
-						if (currentCourses.get(i).getTerm().getYear() == course.getTerm().getYear()) {
-							return false;
-						} else {
-							return true;
-						}
-					} else {
+				if (userCourse.getIsPassed() == IsPassed.FALSE) {
+					if (course.getStartDay().after(registeredClasses.get(i).getStartDay())) {
+						System.out.println("bo");
 						return true;
+					} else {
+						System.out.println("bi");
+						return false;
 					}
-
+				} else {
+					System.out.println("bin");
+					return false;
 				}
-				return false;
 			}
 
 		}
@@ -262,8 +276,10 @@ public class CourseService implements ICourseService {
 	// return true if course is not conflicted
 	@Override
 	public boolean isNotTimeConflicted(User user, Course course, List<Integer> regIdClasses) {
+		// courses intended to take
 		List<Course> courses = findRegisteredClasses(regIdClasses);
-		List<Course> registeredCourses = userService.getYourClasses(user);
+		// current registered courses
+		List<Course> registeredCourses = getIntendedDroppdeCourses();
 		registeredCourses.addAll(courses);
 		for (int i = 0; i < registeredCourses.size(); i++) {
 			if (course.getRegId() != registeredCourses.get(i).getRegId()) {
@@ -292,37 +308,6 @@ public class CourseService implements ICourseService {
 		return true;
 
 	}
-
-	public boolean isCourseConflicted(User user, List<Integer> regIdClasses) {
-		int a = 0;
-		List<Course> unConflictedCourses = new ArrayList<Course>();
-		List<Course> registeredClasses = courseService.findRegisteredClasses(regIdClasses);
-		for (int i = 0; i < registeredClasses.size(); i++) {
-			if (courseService.isNotTimeConflicted(user, registeredClasses.get(i), regIdClasses)) {
-				unConflictedCourses.add(registeredClasses.get(i));
-			} else {
-				a++;
-			}
-		}
-		if (a == 0) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public List<Course> getUnconflictedCourse(User user, List<Integer> regIdClasses) {
-		List<Course> unConflictedCourses = new ArrayList<Course>();
-		List<Course> registeredClasses = courseService.findRegisteredClasses(regIdClasses);
-		for (int i = 0; i < registeredClasses.size(); i++) {
-			if (courseService.isNotTimeConflicted(user, registeredClasses.get(i), regIdClasses)) {
-				unConflictedCourses.add(registeredClasses.get(i));
-
-			}
-		}
-		return unConflictedCourses;
-	}
-
 	public boolean isAnyCourseSelected(List<Integer> regIdClasses) {
 		if (regIdClasses == null) {
 			return false;
@@ -378,7 +363,7 @@ public class CourseService implements ICourseService {
 					e.getStartDay(), e.getEndDay(), e.getWaitlist(), e.getSubject().getSubjectCode().toString(),
 					e.getRoom().getRoomName(), e.getTeacher().getName(), from, to, prerequisite,
 					e.getTerm().getSemester().toString(), e.getSubject().getDescription(), term_year, registerStatus,
-					registerRank);
+					registerRank, e.getUnits());
 			courseDtos.add(courseDto);
 
 		});
@@ -401,7 +386,7 @@ public class CourseService implements ICourseService {
 			CourseStudentDto courseStudentDto = new CourseStudentDto(e.getUser().getUsername(), e.getUser().getEmail(),
 					e.getUserCourseStatus().toString(), e.getCourse().getSubject().getSubjectCode().toString(),
 					e.getCourse().getSubject().getDescription(), e.getWaitlistedRank(), e.getCourse().getCapacity(),
-					e.getCourse().getAvailable());
+					e.getCourse().getAvailable(), e.getCourse().getWaitlist());
 			courseStudentDtos.add(courseStudentDto);
 		});
 		return courseStudentDtos;
@@ -425,13 +410,28 @@ public class CourseService implements ICourseService {
 		Page<Course> coursePage = coursePaginationRepository.findAllByTitle(year, search, pageable);
 		return coursePage;
 	}
+	
+	@Override
+	public List<Course> getIntendedDroppdeCourses() {
+		User user = userService.getCurrentLoggedUser();
+		List<StudentCourse> unFilteredList = user.getCourses();
+		List<StudentCourse> filteredList = unFilteredList.stream().filter(c -> c.getIsPassed() == IsPassed.IP)
+				.collect(Collectors.toList());
+		List<Course> IPCourses = new ArrayList<Course>();
+		for (StudentCourse studentCourse : filteredList) {
+			IPCourses.add(studentCourse.getCourse());
+		}
+		return IPCourses;
+	}
 
 	@Override
 	public List<Course> getIPCourses() {
 		User user = userService.getCurrentLoggedUser();
 		List<StudentCourse> unFilteredList = user.getCourses();
 
-		List<StudentCourse> filteredList = unFilteredList.stream().filter(c -> c.getIsPassed() == IsPassed.IP)
+		List<StudentCourse> filteredList = unFilteredList.stream().filter(c -> c.getIsPassed() == IsPassed.IP
+				&& c.getUserCourseStatus() == StudentCourseStatus.Successfull
+				)
 				.collect(Collectors.toList());
 
 		List<Course> IPCourses = new ArrayList<Course>();
@@ -440,5 +440,33 @@ public class CourseService implements ICourseService {
 		}
 		return IPCourses;
 	}
+	
+	// 1 : Cant repeat taken class/classes
+	// 2 : Prerequisites are required
+	// 3 : Courses are conflicted
+	// 4 :no errors occur 
+	public int registerStatus(User user, List<Course> courses, List<Integer> regIdClasses) {
+		List<Course> takenClasses = findRegisteredClasses(regIdClasses);
+		for (int i = 0; i < regIdClasses.size(); i++) {
+			Course course1 = courseRepository.findById(regIdClasses.get(i)).orElse(null);
+			if (!(isRepeated(user, course1))) {
+				return 1;
+			}
+			
+		}
+		for (int i = 0; i < takenClasses.size(); i++) {
+			boolean isPreregquisited = (isPreregquisited(user, takenClasses.get(i)));
+			if (isPreregquisited == false) {
+				return 2;
+			}
+
+			if (!isNotTimeConflicted(user, takenClasses.get(i), regIdClasses)) {
+				return 3;
+			}
+			
+		}
+		return 4;
+	}
+
 
 }

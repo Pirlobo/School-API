@@ -18,7 +18,7 @@ public class PaginationService {
 	private CourseService courseService;
 
 	public PaginationResponse getPagination(int pageNo, String search, String sortField, String sortDir) {
-		int pageSize = 2;
+		int pageSize = 5;
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 		Page<Course> page = courseService.findPaginatedByTitle(year + 1, search, pageNo, pageSize, sortField, sortDir);
 //		Page<Course> page = courseService.findPaginated(pageNo, pageSize, sortField, sortDir);

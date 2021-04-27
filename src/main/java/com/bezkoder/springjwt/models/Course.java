@@ -14,6 +14,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureParameter;
 import javax.persistence.Table;
@@ -30,9 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 		@StoredProcedureParameter(mode = ParameterMode.IN, name = "input_year", type = Integer.class),
 		@StoredProcedureParameter(mode = ParameterMode.IN, name = "title", type = String.class),
 		@StoredProcedureParameter(mode = ParameterMode.OUT, name = "count", type = Integer.class)
-
 }
-
 )
 public class Course {
 
@@ -50,6 +49,25 @@ public class Course {
 	private Date startDay;
 
 	private Date endDay;
+
+	private Integer units;
+	
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true,
+			fetch = FetchType.LAZY)
+	@JsonIgnore
+	private  List<Books> bookList = new ArrayList<Books>();
+	
+	public Integer getUnits() {
+		return units;
+	}
+
+	public List<Books> getBookList() {
+		return bookList;
+	}
+	
+	public void setUnits(Integer units) {
+		this.units = units;
+	}
 
 	@ManyToOne
 	@JsonIgnore
@@ -98,8 +116,8 @@ public class Course {
 	public void setBookList(List<Books> books) {
 		this.books = books;
 	}
-
 	public Term getTerm() {
+
 		return term;
 	}
 
@@ -111,6 +129,7 @@ public class Course {
 //	private List<Books> books = new ArrayList<Books>();
 
 	@ManyToOne
+	@JsonIgnore
 	private Subject subject;
 
 	private Integer waitlist;
@@ -193,7 +212,7 @@ public class Course {
 	}
 
 	public Course(Integer regId, Integer section, Integer capacity, Date startDay, Date endDay, Teacher teacher,
-			Room room, Term term) {
+			Room room, Term term, Integer units) {
 		super();
 		this.regId = regId;
 		this.section = section;
@@ -205,6 +224,7 @@ public class Course {
 		this.teacher = teacher;
 		this.room = room;
 		this.term = term;
+		this.units = units;
 	}
 
 	public Course(Integer regId, Integer section, Integer available, Date startDay, Date endDay, Teacher teacher,

@@ -11,6 +11,8 @@ public interface FileDBRepository extends JpaRepository<FileDB, String> {
 
 	@Query(value = "select * from school.files as f where f.course_reg_id = ?1", nativeQuery = true)
 	List<FileDB> getAllFilesByCourseId (Integer regId);
+	
+	
 }
 
 

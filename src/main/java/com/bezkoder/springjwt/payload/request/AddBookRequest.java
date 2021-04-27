@@ -1,39 +1,49 @@
-package com.bezkoder.springjwt.dto;
+package com.bezkoder.springjwt.payload.request;
+
 import com.sun.istack.NotNull;
 
-public class BookDto {
+public class AddBookRequest {
 	
 	@NotNull
-	private String subjectCode;
-	
-	public String getSubjectCode() {
-		return subjectCode;
-	}
-
-	public void setSubjectCode(String subjectCode) {
-		this.subjectCode = subjectCode;
-	}
+	private Integer regId;
 
 	@NotNull
-	private String ISBN;
+	private String isbn;
+	
+	public Integer getRegId() {
+		return regId;
+	}
+
+	public void setRegId(Integer regId) {
+		this.regId = regId;
+	}
 
 	@NotNull
 	private String title;
 
 	@NotNull
 	private String publisher;
-
+	
 	@NotNull
 	private String listOfAuthors;
-	
+
+	@NotNull
 	private String imageUrl;
-	
-	public String getISBN() {
-		return ISBN;
+
+	public String getIsbn() {
+		return isbn;
 	}
 
-	public void setISBN(String iSBN) {
-		ISBN = iSBN;
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
 	}
 
 	public String getTitle() {
@@ -51,6 +61,7 @@ public class BookDto {
 	public void setPublisher(String publisher) {
 		this.publisher = publisher;
 	}
+
 	public String getListOfAuthors() {
 		return listOfAuthors;
 	}
@@ -59,19 +70,10 @@ public class BookDto {
 		this.listOfAuthors = listOfAuthors;
 	}
 
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
-
-	public BookDto(String subjectCode, String iSBN, String title, String publisher, String listOfAuthors,
-			String imageUrl) {
+	public AddBookRequest(Integer regId, String isbn, String title, String publisher, String listOfAuthors, String imageUrl) {
 		super();
-		this.subjectCode = subjectCode;
-		ISBN = iSBN;
+		this.regId = regId;
+		this.isbn = isbn;
 		this.title = title;
 		this.publisher = publisher;
 		this.listOfAuthors = listOfAuthors;
@@ -79,4 +81,7 @@ public class BookDto {
 	}
 
 	
+	
+	
+
 }

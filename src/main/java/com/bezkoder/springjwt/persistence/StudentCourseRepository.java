@@ -15,6 +15,6 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, St
 	@Query(value = "select * from school.student_course as sc where sc.user_id = ?1 and sc.course_reg_id = ?2", nativeQuery = true)
 	StudentCourse findStudentCourseById(Long userId, Integer courseId);
 	
-	@Query(value = "SELECT * FROM student_course as sc where sc.waitlisted_rank > ?1", nativeQuery = true)
-	List<StudentCourse> findAfterRank(Integer rank);
+	@Query(value = "SELECT * FROM student_course as sc where sc.waitlisted_rank > ?1 and sc.course_reg_id = ?2", nativeQuery = true)
+	List<StudentCourse> findAfterRankOfClass(Integer rank, Integer regId);
 }

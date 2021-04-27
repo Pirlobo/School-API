@@ -17,10 +17,26 @@ public class CourseStudentDto {
 	private Integer capacity;
 
 	private Integer available;
+	
+	private Integer waitList;
 
 	public Integer getAvailable() {
 		return available;
 	}
+
+	
+
+	public Integer getWaitList() {
+		return waitList;
+	}
+
+
+
+	public void setWaitList(Integer waitList) {
+		this.waitList = waitList;
+	}
+
+
 
 	public void setAvailable(Integer available) {
 		this.available = available;
@@ -83,7 +99,7 @@ public class CourseStudentDto {
 	}
 
 	public CourseStudentDto(String userName, String email, String registerStatus, String courseTitle,
-			String description, Integer wailistedRank, Integer capacity, Integer available) {
+			String description, Integer wailistedRank, Integer capacity, Integer available, Integer waitList) {
 		super();
 		this.userName = userName;
 		this.email = email;
@@ -93,6 +109,7 @@ public class CourseStudentDto {
 		this.wailistedRank = wailistedRank;
 		this.capacity = capacity;
 		this.available = available;
+		this.waitList = waitList;
 	}
 
 }
