@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.controllers;
 
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -126,21 +127,4 @@ public class TeacherController {
 		List<CourseStudentDto> courseStudentDtos = courseService.courseToCourseStudentDtos(regId);
 		return ResponseEntity.ok(courseStudentDtos);
 	}
-
-	@GetMapping("getRequiredBooksByCourse/{regId}")
-	public ResponseEntity<?> getRequiredBooksByCourse(@PathVariable Integer regId){
-		Course course = courseService.findCourseById(regId);
-		List<Books> books = course.getBookList();
-		books.forEach(e -> {
-			String img = null;
-		    try {
-		        img = Files.readString(Path.of("src/main/resources/static/image/book/" + e.getId()));
-		        e.setImageUrl(img);
-		    } catch (IOException err) {
-		        err.printStackTrace();
-		    }
-		});
-		return ResponseEntity.ok(books);
-	}
-	
 }

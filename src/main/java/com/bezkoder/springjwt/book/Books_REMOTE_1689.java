@@ -1,11 +1,9 @@
 package com.bezkoder.springjwt.book;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import com.bezkoder.springjwt.models.Course;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
@@ -15,17 +13,6 @@ import com.sun.istack.NotNull;
 public class Books {
 
 	@Id
-	@GeneratedValue
-	private Integer id;
-	
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
 	private String isbn;
 
 	@NotNull
@@ -37,7 +24,6 @@ public class Books {
 	@NotNull
 	private String listOfAuthors;
 	
-	@Transient
 	private String imageUrl;
 	
 	public String getImageUrl() {
@@ -108,5 +94,6 @@ public class Books {
 		this.imageUrl = imageUrl;
 		this.course = course;
 	}
+
 
 }

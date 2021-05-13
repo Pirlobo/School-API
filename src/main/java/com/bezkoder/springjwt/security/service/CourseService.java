@@ -1,5 +1,8 @@
 package com.bezkoder.springjwt.security.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -90,9 +93,15 @@ public class CourseService implements ICourseService {
 		courses.forEach(e -> {
 			List<Books> books = e.getBookList();
 			books.forEach(b -> {
-				BookDto bookDto = new BookDto(e.getSubject().getSubjectCode().toString() ,b.getIsbn(), b.getTitle(), b.getPublisher(),
-						b.getListOfAuthors(), b.getImageUrl());
-				bookDtos.add(bookDto);
+				String img = null;
+			    try {
+			        img = Files.readString(Path.of("src/main/resources/static/image/book/" + b.getId()));
+			        BookDto bookDto = new BookDto(e.getSubject().getSubjectCode().toString() ,b.getIsbn(), b.getTitle(), b.getPublisher(),
+							b.getListOfAuthors(), img);
+					bookDtos.add(bookDto);
+			    } catch (IOException err) {
+			        err.printStackTrace();
+			    }
 			} );
 		});
 		return bookDtos;

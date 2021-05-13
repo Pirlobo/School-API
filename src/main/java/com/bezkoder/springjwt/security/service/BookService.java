@@ -1,6 +1,5 @@
 package com.bezkoder.springjwt.security.service;
 
-import java.awt.print.Book;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,6 +16,7 @@ import com.bezkoder.springjwt.persistence.BookRepository;
 @Service
 public class BookService implements IBookService {
 	private static final Logger LOGGER=LoggerFactory.getLogger(BookService.class);
+
 	// BookRepository instance will be created by @Repository
 	// Now we have bookRepo object
 	// BookService instance will be created and has bookRepo as a dependency which is set implicitly via setter method
@@ -52,7 +52,10 @@ public class BookService implements IBookService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+	}
 
+	public void save(Books book) {
+		bookRepository.save(book);
 	}
 
 }

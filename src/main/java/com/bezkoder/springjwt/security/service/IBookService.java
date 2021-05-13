@@ -1,6 +1,5 @@
 package com.bezkoder.springjwt.security.service;
 
-import java.io.IOException;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import com.bezkoder.springjwt.book.Books;
@@ -16,6 +15,9 @@ public interface IBookService {
 	Books findById(String isbn);
 	
 	void save(AddBookRequest book);
+	
+	void save(Books book);
+
 
 //	public Map<String, List<BookDto>> getResultMap();
 
